@@ -1,0 +1,8 @@
+# IDE / Local files
+.DS_Store
+.gemini/
+.agents/
+.vscode/
+
+# Vercel
+.vercel/

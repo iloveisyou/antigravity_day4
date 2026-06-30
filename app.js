@@ -11,10 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     currentCharCount.textContent = textLength;
   });
 
-  // Voice Input Simulation
+  // Speech Recognition API setup
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
   let isListening = false;
-  voiceInputBtn.addEventListener('click', () => {
-    if (!isListening) {
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'ko-KR';
+
+    recognition.onstart = () => {
       isListening = true;
       voiceInputBtn.innerHTML = `
         <svg class="btn-icon pulse" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -24,24 +32,47 @@ document.addEventListener('DOMContentLoaded', () => {
         음성 인식 중...
       `;
       voiceInputBtn.classList.add('listening');
+    };
+
+    recognition.onresult = (event) => {
+      const current = event.resultIndex;
+      const transcript = event.results[current][0].transcript;
       
-      // Mock typing after 2 seconds
-      setTimeout(() => {
-        if (isListening) {
-          const mockTexts = [
-            "오늘도 바쁜 하루였다. 퇴근길 밤하늘이 예뻤다. ",
-            "친구랑 오랜만에 맛있는 밥을 먹어서 기분이 좋다. ",
-            "하는 일이 잘 안 풀려서 조금 답답한 기분이 든다. "
-          ];
-          const randomText = mockTexts[Math.floor(Math.random() * mockTexts.length)];
-          diaryInput.value += randomText;
-          diaryInput.dispatchEvent(new Event('input'));
-          
-          resetVoiceBtn();
-        }
-      }, 2000);
-    } else {
+      // Append text
+      const space = diaryInput.value.length > 0 && !diaryInput.value.endsWith(' ') ? ' ' : '';
+      diaryInput.value += space + transcript;
+      diaryInput.dispatchEvent(new Event('input'));
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      if (event.error === 'not-allowed') {
+        alert('마이크 사용 권한이 거부되었습니다. 브라우저 설정에서 권한을 확인해주세요.');
+      } else {
+        alert('음성 인식 중 오류가 발생했습니다: ' + event.error);
+      }
       resetVoiceBtn();
+    };
+
+    recognition.onend = () => {
+      resetVoiceBtn();
+    };
+  }
+
+  voiceInputBtn.addEventListener('click', () => {
+    if (!SpeechRecognition) {
+      alert('현재 브라우저에서는 음성 인식 기능을 지원하지 않습니다. Chrome 또는 Safari 등을 사용해 주세요.');
+      return;
+    }
+
+    if (!isListening) {
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      recognition.stop();
     }
   });
 

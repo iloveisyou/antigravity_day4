@@ -89,8 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
     voiceInputBtn.classList.remove('listening');
   }
 
-  // Analyze Request Simulation
-  analyzeBtn.addEventListener('click', () => {
+  // Analyze Request via Serverless Function (Gemini API)
+  analyzeBtn.addEventListener('click', async () => {
     const text = diaryInput.value.trim();
     if (!text) {
       alert('일기 내용을 입력해 주세요!');
@@ -100,35 +100,49 @@ document.addEventListener('DOMContentLoaded', () => {
     aiResponseBox.innerHTML = `
       <div class="loading-container">
         <div class="spinner"></div>
-        <p class="loading-text">감정을 분석하고 있습니다...</p>
+        <p class="loading-text">Gemini가 감정을 분석하고 있습니다...</p>
       </div>
     `;
     aiResponseBox.classList.add('has-content');
 
-    setTimeout(() => {
-      // Basic emotion word analysis
-      let emotion = '잔잔한';
-      let advice = '오늘 하루도 수고 많으셨습니다. 따뜻한 차 한 잔과 함께 편안한 저녁을 보내보세요.';
-      
-      if (text.includes('기쁘') || text.includes('좋') || text.includes('행복')) {
-        emotion = '기쁘고 긍정적인';
-        advice = '오늘 하루 동안 느낀 행복한 에너지가 글에서도 잘 느껴집니다! 이 기분을 마음껏 만끽하세요.';
-      } else if (text.includes('슬프') || text.includes('눈물') || text.includes('우울')) {
-        emotion = '조금은 쓸쓸하고 우울한';
-        advice = '때로는 마음껏 감정을 흘려보내는 것도 중요합니다. 오늘은 자신에게 조금 더 너그러운 하루가 되었기를 바랄게요.';
-      } else if (text.includes('화') || text.includes('짜증') || text.includes('답답')) {
-        emotion = '답답하고 화가 나는';
-        advice = '지치고 스트레스 받는 상황이 있으셨나 봅니다. 깊은 심호흡을 하며 마음의 열기를 천천히 식혀보세요.';
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || '감정 분석 요청 중 문제가 발생했습니다.');
       }
 
+      const result = await response.json();
+      
+      aiResponseBox.innerHTML = '';
+      const responseContent = document.createElement('div');
+      responseContent.className = 'response-content';
+      
+      const responseText = document.createElement('p');
+      responseText.className = 'response-text';
+      responseText.style.whiteSpace = 'pre-wrap';
+      responseText.textContent = result.text;
+      
+      responseContent.appendChild(responseText);
+      aiResponseBox.appendChild(responseContent);
+    } catch (error) {
+      console.error('Analysis failed:', error);
       aiResponseBox.innerHTML = `
-        <div class="response-content">
-          <p class="response-text">
-            작성하신 일기에서 <strong>${emotion} 감정</strong>이 느껴집니다.<br><br>
-            ${advice}
+        <div class="response-content error-box">
+          <p class="response-text" style="color: #ef4444;">
+            <strong>분석 실패</strong><br><br>
+            ${error.message}<br>
+            <span style="font-size: 0.85em; color: #888;">(로컬 실행 시 .env 파일에 GEMINI_API_KEY가 설정되어 있고 vercel dev 등으로 서버를 실행했는지 확인해 주세요.)</span>
           </p>
         </div>
       `;
-    }, 1500);
+    }
   });
 });

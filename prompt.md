@@ -49,3 +49,10 @@
 - 모든 핵심 기능(UI, 음성 인식, 환경 변수 로드, Gemini API 호출) 및 연동 설정(Git 원격 저장소, Vercel Production 배포)이 정상 완료되어 있음을 최종 확인
 - `implementation/plan202607021355.md` 및 `walkthrough/202607021355.md` 마크다운 문서 정리 및 저장
 
+### 프롬프트
+> 깃에 커밋 푸시하면 배포도 자동으로 진행해줘
+
+### 결과 (적용내용)
+- Vercel CLI의 `git connect` 명령어로 프로젝트가 이미 GitHub 저장소(`iloveisyou/antigravity_day4`)와 올바르게 연동되어 있음을 감지
+- `implementation/plan202607021358.md` 및 `walkthrough/202607021358.md` 마크다운 파일로 기록 및 저장
+- 수정 및 생성된 파일을 깃에 커밋 및 푸시하여 Vercel의 자동 배포 빌드가 트리거됨을 유발

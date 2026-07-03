@@ -11,6 +11,30 @@ document.addEventListener('DOMContentLoaded', () => {
     currentCharCount.textContent = textLength;
   });
 
+  // Load saved content from localStorage
+  const savedDiaryText = localStorage.getItem('diary_text');
+  const savedAiResponse = localStorage.getItem('diary_ai_response');
+
+  if (savedDiaryText) {
+    diaryInput.value = savedDiaryText;
+    currentCharCount.textContent = savedDiaryText.length;
+  }
+
+  if (savedAiResponse) {
+    aiResponseBox.innerHTML = '';
+    const responseContent = document.createElement('div');
+    responseContent.className = 'response-content';
+    
+    const responseText = document.createElement('p');
+    responseText.className = 'response-text';
+    responseText.style.whiteSpace = 'pre-wrap';
+    responseText.textContent = savedAiResponse;
+    
+    responseContent.appendChild(responseText);
+    aiResponseBox.appendChild(responseContent);
+    aiResponseBox.classList.add('has-content');
+  }
+
   // Speech Recognition API setup
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
@@ -132,6 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
       
       responseContent.appendChild(responseText);
       aiResponseBox.appendChild(responseContent);
+
+      // Save to localStorage
+      localStorage.setItem('diary_text', text);
+      localStorage.setItem('diary_ai_response', result.text);
     } catch (error) {
       console.error('Analysis failed:', error);
       aiResponseBox.innerHTML = `

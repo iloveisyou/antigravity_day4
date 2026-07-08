@@ -1,3 +1,13 @@
+import Redis from 'ioredis';
+
+let redis = null;
+function getRedisClient() {
+  if (!redis && process.env.REDIS_URL) {
+    redis = new Redis(process.env.REDIS_URL);
+  }
+  return redis;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -57,6 +67,35 @@ export default async function handler(req, res) {
 
     if (!contentText) {
       throw new Error('Invalid response from Gemini API');
+    }
+
+    // Save to Redis if configured
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        const kstOffset = 9 * 60 * 60 * 1000;
+        const kstDate = new Date(Date.now() + kstOffset);
+        const yyyy = kstDate.getUTCFullYear();
+        const mm = String(kstDate.getUTCMonth() + 1).padStart(2, '0');
+        const dd = String(kstDate.getUTCDate()).padStart(2, '0');
+        const hh = String(kstDate.getUTCHours()).padStart(2, '0');
+        const min = String(kstDate.getUTCMinutes()).padStart(2, '0');
+        const ss = String(kstDate.getUTCSeconds()).padStart(2, '0');
+        const redisKey = `aiary-${yyyy}${mm}${dd}${hh}${min}${ss}`;
+
+        const payload = {
+          diary: text,
+          aiResponse: contentText,
+          createdAt: kstDate.toISOString()
+        };
+
+        await redisClient.set(redisKey, JSON.stringify(payload));
+        console.log(`Saved diary entry to Redis with key: ${redisKey}`);
+      } catch (redisError) {
+        console.error('Failed to save to Redis:', redisError);
+      }
+    } else {
+      console.warn('Redis is not connected (REDIS_URL env var might be missing)');
     }
 
     return res.status(200).json({ text: contentText });

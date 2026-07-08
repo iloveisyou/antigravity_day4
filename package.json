@@ -1,0 +1,10 @@
+{
+  "name": "antigravity-day4",
+  "version": "1.0.0",
+  "description": "AI Emotion Diary with Vercel Serverless Function and Redis Integration",
+  "main": "app.js",
+
+  "dependencies": {
+    "ioredis": "^5.4.1"
+  }
+}

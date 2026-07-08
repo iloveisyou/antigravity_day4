@@ -160,6 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Save to localStorage
       localStorage.setItem('diary_text', text);
       localStorage.setItem('diary_ai_response', result.text);
+
+      // Refresh history list
+      fetchHistory();
     } catch (error) {
       console.error('Analysis failed:', error);
       aiResponseBox.innerHTML = `
@@ -173,4 +176,64 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
   });
+
+  // History container elements and rendering logic
+  const historyContainer = document.getElementById('history-container');
+
+  async function fetchHistory() {
+    if (!historyContainer) return;
+    try {
+      const response = await fetch('/api/history');
+      if (!response.ok) {
+        throw new Error('히스토리를 불러오는 데 실패했습니다.');
+      }
+      const historyData = await response.json();
+      
+      if (historyData.length === 0) {
+        historyContainer.innerHTML = '<p class="placeholder-text">저장된 일기 내역이 없습니다.</p>';
+        return;
+      }
+      
+      historyContainer.innerHTML = '';
+      historyData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'history-card';
+        
+        // Parse date from Redis key (format: aiary-YYYYMMDDHHmmss)
+        let dateStr = '';
+        if (item.key) {
+          const match = item.key.match(/aiary-(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+          if (match) {
+            dateStr = `${match[1]}-${match[2]}-${match[3]} ${match[4]}:${match[5]}:${match[6]}`;
+          }
+        }
+        if (!dateStr && item.createdAt) {
+          dateStr = new Date(item.createdAt).toLocaleString('ko-KR');
+        }
+        
+        const dateBadge = document.createElement('span');
+        dateBadge.className = 'history-date-badge';
+        dateBadge.textContent = dateStr || '날짜 미상';
+        
+        const diaryText = document.createElement('p');
+        diaryText.className = 'history-diary-text';
+        diaryText.textContent = item.diary || '';
+        
+        const aiReply = document.createElement('p');
+        aiReply.className = 'history-ai-reply';
+        aiReply.textContent = item.aiResponse || '';
+        
+        card.appendChild(dateBadge);
+        card.appendChild(diaryText);
+        card.appendChild(aiReply);
+        historyContainer.appendChild(card);
+      });
+    } catch (err) {
+      console.error('History load error:', err);
+      historyContainer.innerHTML = `<p class="placeholder-text" style="color: #ef4444;">히스토리 로드 실패: ${err.message}</p>`;
+    }
+  }
+
+  // Load history on start
+  fetchHistory();
 });

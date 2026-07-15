@@ -234,6 +234,121 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Load history on start
-  fetchHistory();
+  // Supabase Auth Integration
+  const authContainer = document.getElementById('auth-container');
+  const diaryAppContainer = document.getElementById('diary-app-container');
+  const userEmailDisplay = document.getElementById('user-email-display');
+  
+  const authForm = document.getElementById('auth-form');
+  const emailInput = document.getElementById('auth-email');
+  const passwordInput = document.getElementById('auth-password');
+  const btnLogin = document.getElementById('btn-login');
+  const btnSignup = document.getElementById('btn-signup');
+  const btnGoogleLogin = document.getElementById('btn-google-login');
+  const btnLogout = document.getElementById('btn-logout');
+
+  function updateAuthUI(session) {
+    if (session && session.user) {
+      // User is logged in
+      authContainer.classList.add('hidden');
+      diaryAppContainer.classList.remove('hidden');
+      if (userEmailDisplay) {
+        userEmailDisplay.textContent = session.user.email;
+      }
+      // Load history
+      fetchHistory();
+    } else {
+      // User is logged out
+      authContainer.classList.remove('hidden');
+      diaryAppContainer.classList.add('hidden');
+    }
+  }
+
+  if (window.supabaseClient) {
+    // Check initial session
+    window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+      updateAuthUI(session);
+    });
+
+    // Listen for auth state changes
+    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+      console.log('Supabase Auth Event:', event);
+      updateAuthUI(session);
+    });
+  }
+
+  // Form submit handler (prevent default form submission)
+  if (authForm) {
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
+  }
+
+  // Login handler
+  if (btnLogin) {
+    btnLogin.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      if (!email || !password) {
+        alert('이메일과 비밀번호를 입력해주세요.');
+        return;
+      }
+
+      try {
+        const { error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      } catch (err) {
+        alert('로그인 실패: ' + err.message);
+      }
+    });
+  }
+
+  // Sign up handler
+  if (btnSignup) {
+    btnSignup.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      if (!email || !password) {
+        alert('이메일과 비밀번호를 입력해주세요.');
+        return;
+      }
+
+      try {
+        const { error } = await window.supabaseClient.auth.signUp({ email, password });
+        if (error) throw error;
+        alert('회원가입 요청이 성공했습니다. (가입 확인 이메일이 설정된 경우 이메일을 확인해 주세요)');
+      } catch (err) {
+        alert('회원가입 실패: ' + err.message);
+      }
+    });
+  }
+
+  // Google Login handler
+  if (btnGoogleLogin) {
+    btnGoogleLogin.addEventListener('click', async () => {
+      try {
+        const { error } = await window.supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin
+          }
+        });
+        if (error) throw error;
+      } catch (err) {
+        alert('Google 로그인 실패: ' + err.message);
+      }
+    });
+  }
+
+  // Logout handler
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      try {
+        const { error } = await window.supabaseClient.auth.signOut();
+        if (error) throw error;
+      } catch (err) {
+        alert('로그아웃 실패: ' + err.message);
+      }
+    });
+  }
 });

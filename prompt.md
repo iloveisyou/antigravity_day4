@@ -109,6 +109,17 @@
 - 프론트엔드 브라우저용 `supabase.js` 클라이언트 설정 파일 신설 및 글로벌 객체(`window.supabaseClient`) 초기화 구현
 - `implementationPlan/202607091415.md` 및 `walkthrough/202607091422.md` 문서 저장 및 Git 커밋/푸시 완료
 
+## 2026-07-15
+### 프롬프트
+> step12를 실행해줘
+
+### 결과 (적용내용)
+- `index.html` 리팩토링: 일기장 UI 전체를 `#diary-app-container`로 격리하고 비인증 영역인 `#auth-container` 레이아웃(이메일, 비밀번호 폼, 가입/로그인 및 Google 로그인 버튼) 신설
+- `style.css` 로그인 카드 디자인 정의: 흐릿한 배경의 Glassmorphism 레이아웃 적용 및 반응형 UI 스타일 추가
+- `app.js` Auth 라이프사이클 바인딩: Supabase 세션 상태 감지에 따른 화면 전환 로직(`updateAuthUI`), 이메일 가입/로그인, Google OAuth 로그인 및 로그아웃 핸들러 구현
+- `implementationPlan/202607151037.md` 및 `walkthrough/202607151050.md` 문서 저장 및 Git 커밋/푸시 자동 배포 완료
+
+
 
 
 

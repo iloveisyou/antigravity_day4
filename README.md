@@ -10,7 +10,13 @@
 - vercel, Serverless Redis 데이터베이스 생성 및 연결
 - 연결프로젝트: storage탭 > create > Redis Serverless 선택 
 - 옵션: region(한국) > High Availability(none) > Plans(무료) > Create(Redis 데이터베이스이름)
-
+## day7. 진짜 서비스의 시작: 사용자 인증
+- Vercel 마켓플레이스에서 Supabase 연결
+- 연결프로젝트: storage탭 > create > Supabase 선택
+- 옵션: region(한국) > Plans(무료) > 접두어기본설정값사용 > 데이터베이스이름(책이랑동일하게)
+- strong에서 연결(SUPABASE_SERVICE_ROLE_KEY: 서버에서 사용할 비밀키 / 다른키들은 공개해도 무방)
+- vercel dev: Vercel에 설정된 환경변수가 자동으로 로컬에 적용
+- 그래도 환경변수가 인식안된다면, vercel env pull (Vercel CLI를 통해, 환경변수를 .env.local파일로 가져와)
 
 
 

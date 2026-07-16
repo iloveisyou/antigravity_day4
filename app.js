@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const { error } = await window.supabaseClient.auth.signUp({ email, password });
         if (error) throw error;
-        alert('회원가입 요청이 성공했습니다. (가입 확인 이메일이 설정된 경우 이메일을 확인해 주세요)');
+        alert('가입 확인 이메일을 확인해주세요!');
       } catch (err) {
         alert('회원가입 실패: ' + err.message);
       }

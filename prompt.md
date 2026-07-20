@@ -160,3 +160,12 @@
 ### 결과 (적용내용)
 - `app.js`에서 실시간 임시 세이브 로직 및 분석 완료 후 데이터 삭제/인풋 비우기 기능을 제거하고, 이전 상태(제출 후 로컬스토리지에 분석 내역이 온전히 남고 새로고침 시에도 유지되는 환경)로 원복 완료
 - `implementationPlan/202607201546.md`, `walkthrough/202607201546.md`, `task/202607201546.md` 파일 생성 및 저장 완료
+
+## 2026-07-20 (오후)
+### 프롬프트
+> 15번 실행해줘 (harness.md 내용이 소셜 로그인(Google) 추가로 수정된 버전)
+
+### 결과 (적용내용)
+- `app.js` 및 `index.html` 소스코드 확인 결과, Supabase 기반 Google OAuth 로그인 연동 기능(`signInWithOAuth({ provider: 'google', ... })`)이 이미 완벽히 선구현되어 있음을 검증 완료
+- `implementationPlan/202607201650.md`, `walkthrough/202607201650.md`, `task/202607201650.md` 파일 생성 및 저장 완료
+

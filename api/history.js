@@ -20,7 +20,9 @@ export default async function handler(req, res) {
 
   try {
     const { userId } = req.query;
+    // 현재 로그인된 유저의 ID가 '516e586d-...' 일 때
     const cleanUserId = (userId || 'anonymous').replace(/[^a-zA-Z0-9_-]/g, '');
+    // 해당 유저의 ID로 시작하는 키 목록만 선별적으로 검색 (와일드카드 * 사용)
     const keys = await redisClient.keys(`aiary-${cleanUserId}-*`);
     if (keys.length === 0) {
       return res.status(200).json([]);

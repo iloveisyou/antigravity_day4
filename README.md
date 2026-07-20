@@ -23,5 +23,27 @@
 ㄴ 모듈로드확인: redis-cli MODULE LIST
 ㄴ 레디스중지: redis-cli SHUTDOWN
 
-
-
+- 소셜로그인 추가하기 (Google)
+(1) vercel > 프로젝트 > Storage > Supabase > Open in Supabase 
+(2) Supabase > 프로젝트 > Authentication(lnb) > Sign in / Providers > Google(활성화)
+(3) Google > Enable Sign in with Google (활성)
+ㄴ Client: 
+ㄴ Client Secret (for OAuth):
+ㄴ Callback URL: 복사
+(4) Google Cloud Console (console.cloud.google.com) 접속
+ㄴ 검색에 oauth > OAuth 동의화면 > (클라이언트)
+ㄴ 브랜딩 (앱정보) 설정해야 클라이언트 설정 가능함
+(5) 클라이언트 > 클라이언트 만들기
+ㄴ 애플리케이션 유형: 웹 애플리케이션
+ㄴ 승인된 JavaScript 원본: vercel 배포 URL, 로컬 URL(http://127.0.0.1:3000)
+ㄴ 승인된 리디렉션 URL: 3번 Callback URL 복사한 값 넣기
+ㄴ 만들기 후, 3번에 클라이언트 Id, 클라이언트 보안 비밀번호 복사 붙여넣기 > save
+(6) OAuth 클라이언트 생성
+클라이언트 ID: [GOOGLE_OAUTH_CLIENT_ID]
+ㄴ Clint IDs
+클라이언트 보안 비밀번호: [GOOGLE_OAUTH_CLIENT_SECRET]
+ㄴ Client Secret (for OAuth)
+(7) AI에게 Google 로그인 추가해달라하면됨
+Google로 로그인 버튼에 기능을 추가해줘.
+사용자가 이 버튼을 클릭하면, Supabase를 통해 Google 계정으로 로그인할 수 있게 해줘.
+(supabase.auth.signinWithOAuth 함수를 사용하고, Provider는 google 로 설정하면 됨)

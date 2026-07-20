@@ -144,3 +144,13 @@
 - `app.js`에서 글 입력 시(`input` 이벤트 핸들러) 작성 중이던 일기 내용을 `localStorage.diary_text`에 실시간 임시 저장하도록 변경
 - 감정 분석 및 Redis DB 등록 성공 시, `localStorage`의 임시 저장본(`diary_text` 및 `diary_ai_response`)을 일괄 제거하고 입력창을 비워두도록 구현
 - `implementationPlan/202607201530.md`, `walkthrough/202607201530.md`, `task/202607201530.md` 파일 생성 및 저장 완료
+
+### 프롬프트
+> 서버에서 실행하니 Gemini API invocation failed ... 에러 메시지가 뜨는데 확인해줘
+
+### 결과 (적용내용)
+- Vercel의 `Development` 환경변수 목록 및 로컬 `.env.development.local` 파일에서 `GEMINI_API_KEY` 누락 상태 확인
+- `npx vercel env add GEMINI_API_KEY development` 명령을 구동하여 Vercel 개발 환경변수에 API 키 추가
+- `npx vercel env pull` 명령을 수행하여 로컬 개발 환경용 파일 `.env.development.local`에 API 키를 성공적으로 동기화하여 에러 해결
+- `implementationPlan/202607201535.md`, `walkthrough/202607201535.md`, `task/202607201535.md` 파일 생성 및 저장 완료
+

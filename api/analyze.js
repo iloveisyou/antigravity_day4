@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { text } = req.body;
+  const { text, userId } = req.body;
   if (!text || text.trim() === '') {
     return res.status(400).json({ error: 'Text content is required' });
   }
@@ -81,7 +81,8 @@ export default async function handler(req, res) {
         const hh = String(kstDate.getUTCHours()).padStart(2, '0');
         const min = String(kstDate.getUTCMinutes()).padStart(2, '0');
         const ss = String(kstDate.getUTCSeconds()).padStart(2, '0');
-        const redisKey = `aiary-${yyyy}${mm}${dd}${hh}${min}${ss}`;
+        const cleanUserId = (userId || 'anonymous').replace(/[^a-zA-Z0-9_-]/g, '');
+        const redisKey = `aiary-${cleanUserId}-${yyyy}${mm}${dd}${hh}${min}${ss}`;
 
         const payload = {
           diary: text,

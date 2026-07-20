@@ -130,12 +130,16 @@ document.addEventListener('DOMContentLoaded', () => {
     aiResponseBox.classList.add('has-content');
 
     try {
+      // Get current user session
+      const session = window.supabaseClient ? (await window.supabaseClient.auth.getSession()).data.session : null;
+      const userId = session && session.user ? session.user.id : 'anonymous';
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, userId }),
       });
 
       if (!response.ok) {
@@ -183,7 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchHistory() {
     if (!historyContainer) return;
     try {
-      const response = await fetch('/api/history');
+      // Get current user session
+      const session = window.supabaseClient ? (await window.supabaseClient.auth.getSession()).data.session : null;
+      const userId = session && session.user ? session.user.id : 'anonymous';
+
+      const response = await fetch(`/api/history?userId=${userId}`);
       if (!response.ok) {
         throw new Error('히스토리를 불러오는 데 실패했습니다.');
       }

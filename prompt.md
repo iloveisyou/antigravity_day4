@@ -127,6 +127,17 @@
 - `app.js` 내 회원가입 성공 얼럿 메시지 문구를 명세에 지정된 "가입 확인 이메일을 확인해주세요!"로 수정
 - `implementationPlan/202607151059.md` 및 `walkthrough/202607161613.md` 문서 생성 및 Git 커밋/푸시를 통한 자동 배포 완료
 
+## 2026-07-20
+### 프롬프트
+> step14의 내용을 진행해주고 이미 진행된 내용은 제외하고 진행안된 내용은 처리해줘
+
+### 결과 (적용내용)
+- `app.js`에서 `/api/analyze`와 `/api/history` API를 호출할 때 Supabase 세션 사용자 식별자(`userId`)를 요청 본문 및 쿼리 파라미터로 각각 전달하도록 수정
+- `api/analyze.js`에서 `userId`를 추출하여 Redis 키 이름을 `aiary-{userId}-YYYYMMDDHHmmss` 규격으로 저장하도록 개편
+- `api/history.js`에서 `userId`를 추출하여 Redis에서 해당 로그인 사용자 전용 키 패턴(`aiary-{userId}-*`)만 선별적으로 조회하도록 보완 (계정별 데이터 격리 완성)
+- `implementationPlan/202607201138.md`, `walkthrough/202607201138.md` 및 `task/202607201138.md` 파일 생성 완료
+
+
 
 
 

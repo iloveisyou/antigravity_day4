@@ -19,7 +19,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const keys = await redisClient.keys('aiary-*');
+    const { userId } = req.query;
+    const cleanUserId = (userId || 'anonymous').replace(/[^a-zA-Z0-9_-]/g, '');
+    const keys = await redisClient.keys(`aiary-${cleanUserId}-*`);
     if (keys.length === 0) {
       return res.status(200).json([]);
     }

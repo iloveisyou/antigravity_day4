@@ -5,11 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const analyzeBtn = document.getElementById('analyze-btn');
   const aiResponseBox = document.getElementById('ai-response-box');
 
-  // Character Counter and Auto Save Draft
+  // Character Counter
   diaryInput.addEventListener('input', () => {
     const textLength = diaryInput.value.length;
     currentCharCount.textContent = textLength;
-    localStorage.setItem('diary_text', diaryInput.value);
   });
 
   // Load saved content from localStorage
@@ -162,13 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
       responseContent.appendChild(responseText);
       aiResponseBox.appendChild(responseContent);
 
-      // Clear localStorage draft on successful database submit
-      localStorage.removeItem('diary_text');
-      localStorage.removeItem('diary_ai_response');
-
-      // Clear input fields
-      diaryInput.value = '';
-      currentCharCount.textContent = '0';
+      // Save to localStorage
+      localStorage.setItem('diary_text', text);
+      localStorage.setItem('diary_ai_response', result.text);
 
       // Refresh history list
       fetchHistory();

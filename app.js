@@ -130,16 +130,17 @@ document.addEventListener('DOMContentLoaded', () => {
     aiResponseBox.classList.add('has-content');
 
     try {
-      // Get current user session
+      // Get current user session and access token
       const session = window.supabaseClient ? (await window.supabaseClient.auth.getSession()).data.session : null;
-      const userId = session && session.user ? session.user.id : 'anonymous';
+      const token = session ? session.access_token : null;
 
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ text, userId }),
+        body: JSON.stringify({ text }),
       });
 
       if (!response.ok) {
@@ -187,11 +188,16 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchHistory() {
     if (!historyContainer) return;
     try {
-      // Get current user session
+      // Get current user session and access token
       const session = window.supabaseClient ? (await window.supabaseClient.auth.getSession()).data.session : null;
-      const userId = session && session.user ? session.user.id : 'anonymous';
+      const token = session ? session.access_token : null;
 
-      const response = await fetch(`/api/history?userId=${userId}`);
+      const response = await fetch('/api/history', {
+        method: 'GET',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
       if (!response.ok) {
         throw new Error('히스토리를 불러오는 데 실패했습니다.');
       }
@@ -207,10 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'history-card';
         
-        // Parse date from Redis key (format: aiary-YYYYMMDDHHmmss)
+        // Parse date from Redis key (format: user:UUID:diary-YYYYMMDDHHmmss)
         let dateStr = '';
         if (item.key) {
-          const match = item.key.match(/aiary-(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+          const match = item.key.match(/diary-(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
           if (match) {
             dateStr = `${match[1]}-${match[2]}-${match[3]} ${match[4]}:${match[5]}:${match[6]}`;
           }

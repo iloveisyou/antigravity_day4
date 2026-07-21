@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { supabase } from './_lib/supabase.js';
 
 let redis = null;
 function getRedisClient() {
@@ -19,11 +20,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { userId } = req.query;
-    // 현재 로그인된 유저의 ID가 '516e586d-...' 일 때
+    // Verify Supabase Auth Session Token from Authorization Header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized: Missing token' });
+    }
+    const token = authHeader.split(' ')[1];
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid token', details: authError?.message });
+    }
+    const userId = user.id;
+
     const cleanUserId = (userId || 'anonymous').replace(/[^a-zA-Z0-9_-]/g, '');
     // 해당 유저의 ID로 시작하는 키 목록만 선별적으로 검색 (와일드카드 * 사용)
-    const keys = await redisClient.keys(`aiary-${cleanUserId}-*`);
+    const keys = await redisClient.keys(`user:${cleanUserId}:diary-*`);
     if (keys.length === 0) {
       return res.status(200).json([]);
     }

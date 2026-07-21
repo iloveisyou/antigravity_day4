@@ -169,3 +169,12 @@
 - `app.js` 및 `index.html` 소스코드 확인 결과, Supabase 기반 Google OAuth 로그인 연동 기능(`signInWithOAuth({ provider: 'google', ... })`)이 이미 완벽히 선구현되어 있음을 검증 완료
 - `implementationPlan/202607201650.md`, `walkthrough/202607201650.md`, `task/202607201650.md` 파일 생성 및 저장 완료
 
+## 2026-07-21
+### 프롬프트
+> 16번 실행해줘
+
+### 결과 (적용내용)
+- `app.js`에서 분석 요청 및 히스토리 조회 API 호출 시 요청 헤더에 JWT 세션 액세스 토큰(`Authorization: Bearer <access_token>`)을 포함해 보내도록 연동 완료
+- `api/analyze.js` 및 `api/history.js`에서 헤더 토큰을 추출해 `supabase.auth.getUser(token)`로 유효성을 검증하고 유저 식별자(`user.id`)를 확보하도록 서버리스 보안 로직 구축
+- Redis에 사용자별 격리 키(`user:${userId}:diary-YYYYMMDDHHmmss`)로 일기 데이터를 안전하게 보관 및 조회하도록 설계 개편
+- `implementationPlan/202607210945.md`, `walkthrough/202607210945.md`, `task/202607210945.md` 파일 생성 및 저장 완료

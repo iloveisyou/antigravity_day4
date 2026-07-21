@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { supabase } from './_lib/supabase.js';
 
 let redis = null;
 function getRedisClient() {
@@ -13,7 +14,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { text, userId } = req.body;
+  // Verify Supabase Auth Session Token from Authorization Header
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: Missing token' });
+  }
+  const token = authHeader.split(' ')[1];
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  if (authError || !user) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid token', details: authError?.message });
+  }
+  const userId = user.id;
+
+  const { text } = req.body;
   if (!text || text.trim() === '') {
     return res.status(400).json({ error: 'Text content is required' });
   }
@@ -82,7 +95,7 @@ export default async function handler(req, res) {
         const min = String(kstDate.getUTCMinutes()).padStart(2, '0');
         const ss = String(kstDate.getUTCSeconds()).padStart(2, '0');
         const cleanUserId = (userId || 'anonymous').replace(/[^a-zA-Z0-9_-]/g, '');
-        const redisKey = `aiary-${cleanUserId}-${yyyy}${mm}${dd}${hh}${min}${ss}`;
+        const redisKey = `user:${cleanUserId}:diary-${yyyy}${mm}${dd}${hh}${min}${ss}`;
 
         const payload = {
           diary: text,

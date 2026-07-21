@@ -118,3 +118,13 @@
 - Google로 로그인 버튼에 기능을 추가해줘.
 - 사용자가 이 버튼을 클릭하면, Supabase를 통해 Google 계정으로 로그인할 수 있게 해줘.
 (supabase.auth.signinWithOAuth 함수를 사용하고, Provider는 google 로 설정하면 됨)
+
+## step16. 서버리스 함수에서 사용자 확인하기 
+- 이제 사용자별로 데이터를 분리하자
+1. 프론트엔드에서 '/api/analyze' API를 호출할때, 현재 로그인한 사용자의 세션 토큰 (access token)을 요청헤더에 포함해서 보내도록 수정해줘.
+2. 'api/analyze.js' 서버리스 함수에서 요청 헤더와 토큰을 확인해서 사용자의 ID를 가져와줘. 서버리스 함수에서는 환경 변수 SUPABASE_SERVICE_ROLE_KEY를 사용해서 Supabase 관리자 클라이언트를 초기화하고, 프론트엔드에서 보낸 토큰을 검증해줘.
+3. Serverless Redis에 데이터를 저장할 때, 키에 사용자 ID를 포함해줘.
+예) 기존 'diary-20260708161300' 대신, 'user: [사용자ID]:diary-20260708161300' 
+4. '/api/history' API에서도 현재 로그인한 사용자의 일기만 가져오도록 수정해줘.
+- 관련 최신 정보는 웹 검색읕 통해 탐색한 다음 적용해줘.
+- 베스트 프랙티스 방법을 사용해줘

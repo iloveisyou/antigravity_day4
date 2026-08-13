@@ -262,10 +262,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLogout = document.getElementById('btn-logout');
 
   function updateAuthUI(session) {
+    const chatToggleBtn = document.getElementById('chat-toggle-btn');
+    const chatWindow = document.getElementById('chat-window');
+
     if (session && session.user) {
       // User is logged in
       authContainer.classList.add('hidden');
       diaryAppContainer.classList.remove('hidden');
+      if (chatToggleBtn) chatToggleBtn.classList.remove('hidden');
       if (userEmailDisplay) {
         userEmailDisplay.textContent = session.user.email;
       }
@@ -275,6 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // User is logged out
       authContainer.classList.remove('hidden');
       diaryAppContainer.classList.add('hidden');
+      if (chatToggleBtn) chatToggleBtn.classList.add('hidden');
+      if (chatWindow) chatWindow.classList.add('hidden');
     }
   }
 

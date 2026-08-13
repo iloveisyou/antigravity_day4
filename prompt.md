@@ -181,12 +181,12 @@
 
 ## 2026-08-13
 ### 프롬프트
-> step17을 실행해줘
+> step18 실행해줘
 
 ### 결과 (적용내용)
-- `index.html`에 고정형 플로팅 채팅 버튼(`#chat-toggle-btn`) 및 팝업 채팅창 UI (`#chat-window`) 구조 추가
-- `style.css`에 Glassmorphism 스타일, 모션 애니메이션(`slideUp`), 수/발신 말풍선 및 이모티콘 피커 스타일 추가
-- `app.js`에 채팅창 토글(열기/닫기) 로직, 이모티콘 텍스트 입력창 자동 삽입 및 데모 메시지 렌더링 이벤트 연결
-- `implementationPlan/202608131503.md`, `task/202608131503.md`, `walkthrough/202608131503.md` 문서 이력 관리 완료
+- `app.js`에서 채팅 전송 폼 제출(`submit` 이벤트 및 Enter 키) 시 로그인된 사용자의 이메일(`user_email`)과 입력 메시지(`content`)를 Supabase `messages` 테이블에 추가하는 insert 연동 구현
+- 메시지 DB 저장 성공 시 채팅 입력창(`chatInput`) 내용 비우기(초기화) 로직 완성
+- `implementationPlan/202608131611.md`, `task/202608131611.md`, `walkthrough/202608131611.md` 문서 이력 관리 완료
+
 
 

@@ -430,29 +430,42 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (chatForm) {
-    chatForm.addEventListener('submit', (e) => {
+    chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const messageText = chatInput.value.trim();
       if (!messageText) return;
 
-      // Render demo outgoing message
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'chat-message outgoing';
+      try {
+        if (!window.supabaseClient) {
+          throw new Error('Supabase 클라이언트가 설정되지 않았습니다.');
+        }
 
-      const bubble = document.createElement('div');
-      bubble.className = 'message-bubble';
-      bubble.textContent = messageText;
+        const sessionRes = await window.supabaseClient.auth.getSession();
+        const userEmail = sessionRes.data.session?.user?.email;
 
-      const time = document.createElement('div');
-      time.className = 'message-time';
-      time.textContent = '방금 전';
+        if (!userEmail) {
+          alert('로그인이 필요합니다.');
+          return;
+        }
 
-      msgDiv.appendChild(bubble);
-      msgDiv.appendChild(time);
-      chatMessages.appendChild(msgDiv);
+        // Insert new message into Supabase 'messages' table
+        const { error } = await window.supabaseClient
+          .from('messages')
+          .insert({
+            content: messageText,
+            user_email: userEmail
+          });
 
-      chatInput.value = '';
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (error) {
+          throw error;
+        }
+
+        // Clear input box on success
+        chatInput.value = '';
+      } catch (err) {
+        console.error('메시지 전송 실패:', err);
+        alert('메시지 전송 중 오류가 발생했습니다: ' + err.message);
+      }
     });
   }
 });

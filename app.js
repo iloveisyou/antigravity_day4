@@ -365,4 +365,89 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Floating Chat UI Handler
+  const chatToggleBtn = document.getElementById('chat-toggle-btn');
+  const chatWindow = document.getElementById('chat-window');
+  const chatCloseBtn = document.getElementById('chat-close-btn');
+  const chatIconOpen = document.querySelector('.chat-icon-open');
+  const chatIconClose = document.querySelector('.chat-icon-close');
+  const chatEmojiBtn = document.getElementById('chat-emoji-btn');
+  const chatEmojiPicker = document.getElementById('chat-emoji-picker');
+  const chatForm = document.getElementById('chat-form');
+  const chatInput = document.getElementById('chat-input');
+  const chatMessages = document.getElementById('chat-messages');
+
+  function toggleChatWindow() {
+    if (!chatWindow) return;
+    const isHidden = chatWindow.classList.contains('hidden');
+    if (isHidden) {
+      chatWindow.classList.remove('hidden');
+      chatIconOpen.classList.add('hidden');
+      chatIconClose.classList.remove('hidden');
+      chatInput.focus();
+    } else {
+      chatWindow.classList.add('hidden');
+      chatIconOpen.classList.remove('hidden');
+      chatIconClose.classList.add('hidden');
+      chatEmojiPicker.classList.add('hidden');
+    }
+  }
+
+  if (chatToggleBtn) {
+    chatToggleBtn.addEventListener('click', toggleChatWindow);
+  }
+
+  if (chatCloseBtn) {
+    chatCloseBtn.addEventListener('click', toggleChatWindow);
+  }
+
+  if (chatEmojiBtn && chatEmojiPicker) {
+    chatEmojiBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      chatEmojiPicker.classList.toggle('hidden');
+    });
+
+    chatEmojiPicker.addEventListener('click', (e) => {
+      if (e.target.classList.contains('emoji-item')) {
+        chatInput.value += e.target.textContent;
+        chatInput.focus();
+        chatEmojiPicker.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!chatEmojiPicker.contains(e.target) && e.target !== chatEmojiBtn) {
+        chatEmojiPicker.classList.add('hidden');
+      }
+    });
+  }
+
+  if (chatForm) {
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const messageText = chatInput.value.trim();
+      if (!messageText) return;
+
+      // Render demo outgoing message
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-message outgoing';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+      bubble.textContent = messageText;
+
+      const time = document.createElement('div');
+      time.className = 'message-time';
+      time.textContent = '방금 전';
+
+      msgDiv.appendChild(bubble);
+      msgDiv.appendChild(time);
+      chatMessages.appendChild(msgDiv);
+
+      chatInput.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+  }
 });
+

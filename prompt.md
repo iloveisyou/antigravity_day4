@@ -178,3 +178,15 @@
 - `api/analyze.js` 및 `api/history.js`에서 헤더 토큰을 추출해 `supabase.auth.getUser(token)`로 유효성을 검증하고 유저 식별자(`user.id`)를 확보하도록 서버리스 보안 로직 구축
 - Redis에 사용자별 격리 키(`user:${userId}:diary-YYYYMMDDHHmmss`)로 일기 데이터를 안전하게 보관 및 조회하도록 설계 개편
 - `implementationPlan/202607210945.md`, `walkthrough/202607210945.md`, `task/202607210945.md` 파일 생성 및 저장 완료
+
+## 2026-08-13
+### 프롬프트
+> step17을 실행해줘
+
+### 결과 (적용내용)
+- `index.html`에 고정형 플로팅 채팅 버튼(`#chat-toggle-btn`) 및 팝업 채팅창 UI (`#chat-window`) 구조 추가
+- `style.css`에 Glassmorphism 스타일, 모션 애니메이션(`slideUp`), 수/발신 말풍선 및 이모티콘 피커 스타일 추가
+- `app.js`에 채팅창 토글(열기/닫기) 로직, 이모티콘 텍스트 입력창 자동 삽입 및 데모 메시지 렌더링 이벤트 연결
+- `implementationPlan/202608131503.md`, `task/202608131503.md`, `walkthrough/202608131503.md` 문서 이력 관리 완료
+
+

@@ -6,14 +6,14 @@
 - AI API를 활용해서 내가 일기를 작성하면 실시간으로 AI가 내 감정을 설명해줌
 - 브라우저의 로컬 스토리지에 내용을 저장해서. 새로고침해도 내용 유지
 
-## day6. 서버리스로 한 단계 업그레이드
+## day6. 서버리스로 한 단계 업그레이드 (vercel, Serverless Redis)
 - 브라우저 저장이 아닌 서버저장, vercel 연결
 - 나만의 API 파일을 만들어서 백엔드에서만 호출 (로컬 부팅시는 env파일 활용)
 - vercel, Serverless Redis 데이터베이스 생성 및 연결
 - 연결프로젝트: storage탭 > create > Redis Serverless 선택 
 - 옵션: region(한국) > High Availability(none) > Plans(무료) > Create(Redis 데이터베이스이름)
 
-## day7. 진짜 서비스의 시작: 사용자 인증
+## day7. 진짜 서비스의 시작: 사용자 인증 (vercel, Supabase)
 - Vercel 마켓플레이스에서 Supabase 연결
 - 연결프로젝트: storage탭 > create > Supabase 선택
 - 옵션: region(한국) > Plans(무료) > 접두어기본설정값사용 > 데이터베이스이름(책이랑동일하게)
@@ -60,6 +60,16 @@ Redius 에 저장함
 Supabase에서 계정 생성할때 암호화 된 토큰을 발급 후, API가 호출될때마다 백엔드 가서 검증 함.
 보안은 강해졌지만 복잡성 조금 증가와 백엔드로 갔다와야하므로 네트워크 비용이 조금 들긴 함
 (3) 자세한 내용은 token.md 파일 참고 (자세히 기록하라고 함)
+
+## day8. 실시간 데이터 연동하기 (서버로 업그레이드, vercel, Supabase)
+- Serverless Redis 는 키-값 형태로 데이터를 빠르게 저장하고 꺼내오는데 탁월함. 일기같은 단순구조
+- 채팅(누가/언제/어떤방/무슨말했는지)구조를 체계적으로 관리하고, 새로운 메시지 추가될때 실시간으로 알림
+- 이런채팅구조에 탁월한 복잡한 관계형 데이터 실시간 기능의 Supabase의 데이터베이스, PostgersSQL 제격
+- 또한 데이터베이스의 보안기능, 로우레벨보안(Row Level Security, RLS)규칙 = 로그인한사용자만 글쓰기
+- 데이터 한한줄에 대한 접근 권한을 정교하게 제어 기술
+- Supabase는 로그인과 같은 견고만 문도 만들어주고
+- Supabase는 실시간 데이터베이스(Realtime Database) = 새로고침 없이 다름사람화면에 나타나는 기능
+
 
 ## 4일차 모두 정리하면
 - 회원관리, 로그인 기능을 추가하고

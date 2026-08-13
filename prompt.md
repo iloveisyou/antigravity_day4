@@ -181,12 +181,14 @@
 
 ## 2026-08-13
 ### 프롬프트
-> step18 실행해줘
+> step19번 실행해줘
 
 ### 결과 (적용내용)
-- `app.js`에서 채팅 전송 폼 제출(`submit` 이벤트 및 Enter 키) 시 로그인된 사용자의 이메일(`user_email`)과 입력 메시지(`content`)를 Supabase `messages` 테이블에 추가하는 insert 연동 구현
-- 메시지 DB 저장 성공 시 채팅 입력창(`chatInput`) 내용 비우기(초기화) 로직 완성
-- `implementationPlan/202608131611.md`, `task/202608131611.md`, `walkthrough/202608131611.md` 문서 이력 관리 완료
+- `app.js`에서 Supabase `messages` 테이블의 기존 채팅 데이터를 전체 조회(`created_at` 오름차순)하여 렌더링하는 `fetchChatMessages` 함수 작성
+- 작성자 이메일 주소에서 `@` 앞 닉네임을 추출하여 표출 및 본인/타인 구분 말풍선 UI 적용
+- Supabase Realtime 채널(`messages`)의 `INSERT` 이벤트를 구독하여 타인/본인 메시지 발생 시 실시간으로 화면 하단에 렌더링하는 `subscribeChatRealtime` 기능 구현
+- `implementationPlan/202608131633.md`, `task/202608131633.md`, `walkthrough/202608131633.md` 문서 이력 관리 완료
+
 
 
 

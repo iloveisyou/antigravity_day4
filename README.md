@@ -70,6 +70,35 @@ Supabase에서 계정 생성할때 암호화 된 토큰을 발급 후, API가 �
 - Supabase는 로그인과 같은 견고만 문도 만들어주고
 - Supabase는 실시간 데이터베이스(Realtime Database) = 새로고침 없이 다름사람화면에 나타나는 기능
 
+- 메세지 담을 테이블 만들기
+(1) Supabase 대시보드 > Table Editor > Create a table(New Table)
+(2) 테이블 이름(Name): messages, Enable Row Level Security(RLS): 체크
+(3) 테이블 열(Columns) 추가
+    ㄴ id: (기본) int8 / NULL
+    ㄴ created_at: (기본) text / now()
+    ㄴ content: (메시지를 담을그릇) text / NULL
+    ㄴ userid: (누가 썻는지) uuid / auth.uid() -> 메시지를 작성한 사용자의 고유 ID 자동기록
+    ㄴ user_email: (보낸사람의이메일) text / NULL
+    ㄴ save
+- 데이터 접근 규칙, RLS 정책 설정하기
+(1) Supabase > Table Editor > messages 테이블화면 > Add RLS policy(Row Level Security 정책추가) 버튼 클릭
+(2) Create a new Row Level Security policy 양식 작성
+    ㄴ Policy name(정책이름): Allow logged-in users to view messages (알아듣기 쉬운 이름으로)
+    ㄴ Policy Command(정책 명령어): SELECT
+    ㄴ USE OPTIONS ABOVE TO EDIT 에디터 가장 아래에 auth.uid() IS NOT NULL 추가 (로그인하여 사용자 ID가 존재하는 사람만 허용하라는 설정)
+    ㄴ Save policy
+(3) 메시지 작성(INSERT) 정책 만들기
+    ㄴ 로그인한 사용자가 자기 자신의 ㅑㅇ로만 새로운 메시지를 작성할 수 있도록, 허용하는 정책 추가
+    ㄴ 이는 다른 사람인척 메시지를 쓰는 것을 방지하는 중요한 규칙
+    ㄴ 다시 Table Editor > messages 테이블화면 > Add RLS policy(Row Level Security 정책추가) 버튼 클릭
+    ㄴ Policy name(정책이름): Allow individual users to insert their own messages
+    ㄴ Policy Command(정책 명령어): INSERT
+    ㄴ USE OPTIONS ABOVE TO EDIT 에디터 가장 아래에 auth.uid() = user_id 추가 (글을 쓰려는 사람의 ID(auth.uid())와 데이터에 기록될 user_id가 반드시 같을때만 가능하도록 설정) 
+    ㄴ Save policy
+(4) messages 테이블은 오직 로그인한 사용자만이 메시지를 보고 쓸수 있으며, 절대로 다른 사람을 사칭할 수 없도록 규칙을 정했음   
+(5) 채팅화면읆 만들고 messages완 연결하고 추가로 실시간 기능을 사용해야함(messages>Enable realtime)
+(6) 그리고 실시간으로 메시지를 받아오는 기능을 추가로 소스에서 구현해야 함
+(연결되 supabase의 messages 테이블의 모든 INSERT 이벤트를 구독해줘)
 
 ## 4일차 모두 정리하면
 - 회원관리, 로그인 기능을 추가하고
@@ -80,4 +109,5 @@ Supabase에서 계정 생성할때 암호화 된 토큰을 발급 후, API가 �
 - Serverless Redis로 데이터를 저장하고, 
 - DB같이 수정도 가능하고 데이터를 볼수도 뽑을수도 있음. 하지만 엄청 간단한 data 처리만 가능할듯
 - Supabase는 사용자의 신원을 확인하고 관리
+- Supabase DataBase 는 SQL로 관리함 (수정, 삭제, 추가 다가능, 테이블 구조도 변경가능, RLS 기능으로 보안도 설정가능)
 - 사용한 사이트: github, vercel, supabse, google Cloud (Console)

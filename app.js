@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Floating Chat UI Handler
+  // Floating Chat UI Handler & Realtime Integration
   const chatToggleBtn = document.getElementById('chat-toggle-btn');
   const chatWindow = document.getElementById('chat-window');
   const chatCloseBtn = document.getElementById('chat-close-btn');
@@ -384,6 +384,114 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatInput = document.getElementById('chat-input');
   const chatMessages = document.getElementById('chat-messages');
 
+  let currentUserEmail = '';
+  let realtimeChannel = null;
+
+  function extractNickname(email) {
+    if (!email) return '익명';
+    return email.split('@')[0];
+  }
+
+  function appendChatMessage(msg) {
+    if (!chatMessages) return;
+    
+    // Check duplicate by msg id or dataset
+    if (msg.id && document.querySelector(`[data-msg-id="${msg.id}"]`)) {
+      return;
+    }
+
+    const isOutgoing = currentUserEmail && (msg.user_email === currentUserEmail || msg.users_email === currentUserEmail);
+    const emailToUse = msg.user_email || msg.users_email || '';
+    const nickname = extractNickname(emailToUse);
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-message ${isOutgoing ? 'outgoing' : 'incoming'}`;
+    if (msg.id) {
+      msgDiv.dataset.msgId = msg.id;
+    }
+
+    if (!isOutgoing) {
+      const senderDiv = document.createElement('div');
+      senderDiv.className = 'message-sender';
+      senderDiv.textContent = nickname;
+      msgDiv.appendChild(senderDiv);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    bubble.textContent = msg.content || '';
+
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'message-time';
+    if (msg.created_at) {
+      const date = new Date(msg.created_at);
+      timeDiv.textContent = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    } else {
+      timeDiv.textContent = '방금 전';
+    }
+
+    msgDiv.appendChild(bubble);
+    msgDiv.appendChild(timeDiv);
+    chatMessages.appendChild(msgDiv);
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  async function fetchChatMessages() {
+    if (!window.supabaseClient) return;
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('messages')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      chatMessages.innerHTML = '';
+      if (data && data.length > 0) {
+        data.forEach(msg => appendChatMessage(msg));
+      } else {
+        chatMessages.innerHTML = '<p class="placeholder-text" style="padding: 20px 0;">아직 메시지가 없습니다. 첫 메시지를 남겨보세요! 💬</p>';
+      }
+    } catch (err) {
+      console.error('채팅 메시지 로드 실패:', err);
+    }
+  }
+
+  function subscribeChatRealtime() {
+    if (!window.supabaseClient || realtimeChannel) return;
+
+    realtimeChannel = window.supabaseClient
+      .channel('messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        // Remove empty placeholder if exists
+        const placeholder = chatMessages.querySelector('.placeholder-text');
+        if (placeholder) placeholder.remove();
+        
+        appendChatMessage(payload.new);
+      })
+      .subscribe((status) => {
+        console.log('Supabase Realtime Channel Status:', status);
+      });
+  }
+
+  // Update currentUserEmail when auth updates & initialize chat
+  const originalUpdateAuthUI = updateAuthUI;
+  updateAuthUI = function(session) {
+    if (session && session.user) {
+      currentUserEmail = session.user.email;
+      fetchChatMessages();
+      subscribeChatRealtime();
+    } else {
+      currentUserEmail = '';
+      if (realtimeChannel && window.supabaseClient) {
+        window.supabaseClient.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+      }
+    }
+    originalUpdateAuthUI(session);
+  };
+
   function toggleChatWindow() {
     if (!chatWindow) return;
     const isHidden = chatWindow.classList.contains('hidden');
@@ -392,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
       chatIconOpen.classList.add('hidden');
       chatIconClose.classList.remove('hidden');
       chatInput.focus();
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
       chatWindow.classList.add('hidden');
       chatIconOpen.classList.remove('hidden');
@@ -469,4 +578,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
 

@@ -181,13 +181,12 @@
 
 ## 2026-08-13
 ### 프롬프트
-> step19번 실행해줘
+> step20을 실행해줘
 
 ### 결과 (적용내용)
-- `app.js`에서 Supabase `messages` 테이블의 기존 채팅 데이터를 전체 조회(`created_at` 오름차순)하여 렌더링하는 `fetchChatMessages` 함수 작성
-- 작성자 이메일 주소에서 `@` 앞 닉네임을 추출하여 표출 및 본인/타인 구분 말풍선 UI 적용
-- Supabase Realtime 채널(`messages`)의 `INSERT` 이벤트를 구독하여 타인/본인 메시지 발생 시 실시간으로 화면 하단에 렌더링하는 `subscribeChatRealtime` 기능 구현
-- `implementationPlan/202608131633.md`, `task/202608131633.md`, `walkthrough/202608131633.md` 문서 이력 관리 완료
+- Supabase 스토리지 버킷 `avatars` (자신 폴더 기반 INSERT/UPDATE 보안) 및 `chat-images` (인증 유저 INSERT 보안) RLS 정책 SQL 스크립트 `supabase_storage_policies.sql` 작성
+- `implementationPlan/202608141020.md`, `task/202608141020.md`, `walkthrough/202608141020.md` 문서 이력 관리 완료
+
 
 
 

@@ -438,10 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Avatar element resolution
     let avatarUrlToUse = msg.avatar_url || '';
 
-    // Derive public URL from user_id if avatars bucket convention is used, or fallback
-    if (!avatarUrlToUse && msg.user_id && window.supabaseClient) {
-      avatarUrlToUse = `${supabaseUrl}/storage/v1/object/public/avatars/${msg.user_id}/avatar.png`;
-    } else if (!avatarUrlToUse && isOutgoing && isProfileImgVisible) {
+    if (!avatarUrlToUse && isOutgoing && isProfileImgVisible) {
       avatarUrlToUse = currentUserAvatar;
     }
 
@@ -451,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
       avatarImg.src = avatarUrlToUse;
       avatarImg.alt = nickname;
       avatarImg.onerror = () => {
-        // Fallback to default SVG if image fails to load (e.g. file doesn't exist in avatars bucket)
+        // Fallback to default SVG if image fails to load
         avatarImg.replaceWith(createDefaultAvatarElement());
       };
       rowDiv.appendChild(avatarImg);
@@ -518,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Helper function to update top profile header UI with user avatar
+  // Helper function to update top profile header UI & outgoing chat message avatars with user avatar
   function updateProfileHeaderUI(avatarUrl) {
     const userProfileImg = document.getElementById('user-profile-img');
     const userProfileDefault = document.getElementById('user-profile-default');
@@ -540,6 +537,25 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfileDefault.classList.remove('hidden');
       }
     }
+
+    // Update outgoing message avatars in chat window immediately
+    const outgoingRows = document.querySelectorAll('.chat-message.outgoing .chat-message-row');
+    outgoingRows.forEach(row => {
+      const existingAvatar = row.querySelector('.msg-avatar');
+      const existingDefault = row.querySelector('.msg-avatar-default');
+      
+      if (avatarUrl) {
+        if (existingAvatar) {
+          existingAvatar.src = avatarUrl;
+        } else if (existingDefault) {
+          const newImg = document.createElement('img');
+          newImg.className = 'msg-avatar';
+          newImg.src = avatarUrl;
+          newImg.alt = '프로필 사진';
+          existingDefault.replaceWith(newImg);
+        }
+      }
+    });
   }
 
   // Update currentUserEmail & userAvatarUrl when auth updates & initialize chat
@@ -635,7 +651,8 @@ document.addEventListener('DOMContentLoaded', () => {
           .from('messages')
           .insert({
             content: messageText,
-            user_email: userEmail
+            user_email: userEmail,
+            avatar_url: avatarUrl
           });
 
         if (error) {

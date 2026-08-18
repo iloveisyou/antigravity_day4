@@ -197,6 +197,16 @@
 - 원형 프로필 이미지 영역 또는 '사진 변경' 버튼을 누르면 내 컴퓨터에서 이미지 파일을 선택할 수 있도록 파일 선택창 입력 요소와 클릭 이벤트 연동 (`app.js`)
 - `implementationPlan/202608181035.md`, `task/202608181035.md`, `walkthrough/202608181035.md` 문서 이력 작성 완료
 
+### 프롬프트
+> step21 의 2을 실행해줘.
+
+### 결과 (적용내용)
+- 사용자가 선택한 사진을 Supabase `avatars` 버킷에 유저 ID 경로(`[user_id]/avatar.[ext]`)로 업로드 (`supabase.storage.from('avatars').upload`)
+- 공개 URL을 발급받아 Supabase Auth 유저 메타데이터에 `avatar_url`로 저장 (`supabase.auth.updateUser`)
+- 프로필 변경 성공 시 채팅 상단 프로필 이미지 및 세션 정보를 즉시 최신 사진으로 동기화 (`updateProfileHeaderUI`)
+- 메시지 전송 시 유저 아바타 URL을 포함하고 채팅 메시지 목록에 사용자별 프로필 사진 아바타가 노출되도록 구현 (`app.js`, `style.css`)
+- `implementationPlan/202608181050.md`, `task/202608181050.md`, `walkthrough/202608181050.md` 문서 이력 작성 완료
+
 
 
 

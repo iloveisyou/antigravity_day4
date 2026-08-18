@@ -866,6 +866,40 @@ textarea::placeholder {
   text-decoration: underline;
 }
 
+/* Chat Message Avatar Styles */
+.chat-message-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.chat-message.outgoing .chat-message-row {
+  flex-direction: row-reverse;
+}
+
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.msg-avatar-default {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+}
+
 
 
 

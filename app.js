@@ -417,9 +417,32 @@ document.addEventListener('DOMContentLoaded', () => {
       msgDiv.appendChild(senderDiv);
     }
 
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'chat-message-row';
+
+    // Avatar element
+    if (msg.avatar_url) {
+      const avatarImg = document.createElement('img');
+      avatarImg.className = 'msg-avatar';
+      avatarImg.src = msg.avatar_url;
+      avatarImg.alt = nickname;
+      rowDiv.appendChild(avatarImg);
+    } else {
+      const avatarDefault = document.createElement('div');
+      avatarDefault.className = 'msg-avatar-default';
+      avatarDefault.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      `;
+      rowDiv.appendChild(avatarDefault);
+    }
+
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
     bubble.textContent = msg.content || '';
+    rowDiv.appendChild(bubble);
 
     const timeDiv = document.createElement('div');
     timeDiv.className = 'message-time';
@@ -430,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
       timeDiv.textContent = '방금 전';
     }
 
-    msgDiv.appendChild(bubble);
+    msgDiv.appendChild(rowDiv);
     msgDiv.appendChild(timeDiv);
     chatMessages.appendChild(msgDiv);
 
@@ -475,15 +498,42 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Update currentUserEmail when auth updates & initialize chat
+  // Helper function to update top profile header UI with user avatar
+  function updateProfileHeaderUI(avatarUrl) {
+    const userProfileImg = document.getElementById('user-profile-img');
+    const userProfileDefault = document.getElementById('user-profile-default');
+
+    if (avatarUrl) {
+      if (userProfileImg) {
+        userProfileImg.src = avatarUrl;
+        userProfileImg.classList.remove('hidden');
+      }
+      if (userProfileDefault) {
+        userProfileDefault.classList.add('hidden');
+      }
+    } else {
+      if (userProfileImg) {
+        userProfileImg.classList.add('hidden');
+        userProfileImg.src = '';
+      }
+      if (userProfileDefault) {
+        userProfileDefault.classList.remove('hidden');
+      }
+    }
+  }
+
+  // Update currentUserEmail & userAvatarUrl when auth updates & initialize chat
   const originalUpdateAuthUI = updateAuthUI;
   updateAuthUI = function(session) {
     if (session && session.user) {
       currentUserEmail = session.user.email;
+      const avatarUrl = session.user.user_metadata?.avatar_url || '';
+      updateProfileHeaderUI(avatarUrl);
       fetchChatMessages();
       subscribeChatRealtime();
     } else {
       currentUserEmail = '';
+      updateProfileHeaderUI('');
       if (realtimeChannel && window.supabaseClient) {
         window.supabaseClient.removeChannel(realtimeChannel);
         realtimeChannel = null;
@@ -550,19 +600,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const sessionRes = await window.supabaseClient.auth.getSession();
-        const userEmail = sessionRes.data.session?.user?.email;
+        const user = sessionRes.data.session?.user;
 
-        if (!userEmail) {
+        if (!user) {
           alert('로그인이 필요합니다.');
           return;
         }
+
+        const userEmail = user.email;
+        const avatarUrl = user.user_metadata?.avatar_url || '';
 
         // Insert new message into Supabase 'messages' table
         const { error } = await window.supabaseClient
           .from('messages')
           .insert({
             content: messageText,
-            user_email: userEmail
+            user_email: userEmail,
+            avatar_url: avatarUrl
           });
 
         if (error) {
@@ -578,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Profile Photo File Picker Interaction
+  // Profile Photo File Picker Interaction & Upload Logic
   const profileAvatarContainer = document.getElementById('profile-avatar-container');
   const btnChangeProfilePhoto = document.getElementById('btn-change-profile-photo');
   const profileFileInput = document.getElementById('profile-file-input');
@@ -595,6 +649,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnChangeProfilePhoto) {
     btnChangeProfilePhoto.addEventListener('click', triggerProfileFilePicker);
+  }
+
+  if (profileFileInput) {
+    profileFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.');
+        return;
+      }
+
+      try {
+        if (!window.supabaseClient) {
+          throw new Error('Supabase 클라이언트가 초기화되지 않았습니다.');
+        }
+
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session || !session.user) {
+          alert('로그인이 필요합니다.');
+          return;
+        }
+
+        const userId = session.user.id;
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${userId}/avatar.${fileExt}`;
+
+        // Upload file to 'avatars' bucket in Supabase storage
+        const { error: uploadError } = await window.supabaseClient.storage
+          .from('avatars')
+          .upload(filePath, file, {
+            upsert: true
+          });
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: publicUrlData } = window.supabaseClient.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+
+        const publicUrl = publicUrlData.publicUrl + '?t=' + new Date().getTime();
+
+        // Update Supabase Auth user metadata
+        const { data: userData, error: updateError } = await window.supabaseClient.auth.updateUser({
+          data: { avatar_url: publicUrl }
+        });
+
+        if (updateError) throw updateError;
+
+        // Update profile header UI immediately
+        updateProfileHeaderUI(publicUrl);
+        alert('프로필 사진이 성공적으로 변경되었습니다!');
+
+      } catch (err) {
+        console.error('프로필 사진 업로드 오류:', err);
+        alert('프로필 사진 업로드에 실패했습니다: ' + err.message);
+      } finally {
+        profileFileInput.value = '';
+      }
+    });
   }
 });
 

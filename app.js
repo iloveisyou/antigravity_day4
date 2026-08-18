@@ -392,6 +392,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return email.split('@')[0];
   }
 
+  function createDefaultAvatarElement() {
+    const avatarDefault = document.createElement('div');
+    avatarDefault.className = 'msg-avatar-default';
+    avatarDefault.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    `;
+    return avatarDefault;
+  }
+
   function appendChatMessage(msg) {
     if (!chatMessages) return;
     
@@ -403,6 +415,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const isOutgoing = currentUserEmail && (msg.user_email === currentUserEmail || msg.users_email === currentUserEmail);
     const emailToUse = msg.user_email || msg.users_email || '';
     const nickname = extractNickname(emailToUse);
+
+    const currentUserAvatar = document.getElementById('user-profile-img')?.src;
+    const isProfileImgVisible = document.getElementById('user-profile-img') && !document.getElementById('user-profile-img').classList.contains('hidden');
 
     const msgDiv = document.createElement('div');
     msgDiv.className = `chat-message ${isOutgoing ? 'outgoing' : 'incoming'}`;
@@ -421,26 +436,27 @@ document.addEventListener('DOMContentLoaded', () => {
     rowDiv.className = 'chat-message-row';
 
     // Avatar element resolution
-    const currentUserAvatar = document.getElementById('user-profile-img')?.src;
-    const isProfileImgVisible = document.getElementById('user-profile-img') && !document.getElementById('user-profile-img').classList.contains('hidden');
-    const avatarUrlToUse = msg.avatar_url || (isOutgoing && isProfileImgVisible ? currentUserAvatar : '');
+    let avatarUrlToUse = msg.avatar_url || '';
+
+    // Derive public URL from user_id if avatars bucket convention is used, or fallback
+    if (!avatarUrlToUse && msg.user_id && window.supabaseClient) {
+      avatarUrlToUse = `${supabaseUrl}/storage/v1/object/public/avatars/${msg.user_id}/avatar.png`;
+    } else if (!avatarUrlToUse && isOutgoing && isProfileImgVisible) {
+      avatarUrlToUse = currentUserAvatar;
+    }
 
     if (avatarUrlToUse) {
       const avatarImg = document.createElement('img');
       avatarImg.className = 'msg-avatar';
       avatarImg.src = avatarUrlToUse;
       avatarImg.alt = nickname;
+      avatarImg.onerror = () => {
+        // Fallback to default SVG if image fails to load (e.g. file doesn't exist in avatars bucket)
+        avatarImg.replaceWith(createDefaultAvatarElement());
+      };
       rowDiv.appendChild(avatarImg);
     } else {
-      const avatarDefault = document.createElement('div');
-      avatarDefault.className = 'msg-avatar-default';
-      avatarDefault.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-      `;
-      rowDiv.appendChild(avatarDefault);
+      rowDiv.appendChild(createDefaultAvatarElement());
     }
 
     const bubble = document.createElement('div');

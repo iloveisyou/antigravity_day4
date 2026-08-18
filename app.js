@@ -747,6 +747,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Chat Attachment Button Click Handler (Step 22-1)
+  const chatAttachBtn = document.getElementById('chat-attach-btn');
+  const chatImageInput = document.getElementById('chat-image-input');
+
+  if (chatAttachBtn && chatImageInput) {
+    chatAttachBtn.addEventListener('click', () => {
+      chatImageInput.click();
+    });
+  }
 });
 
 

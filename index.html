@@ -155,6 +155,21 @@
       </button>
     </div>
 
+    <!-- Chat Profile Section -->
+    <div id="chat-profile-section" class="chat-profile-section">
+      <div class="profile-avatar-container" id="profile-avatar-container">
+        <img id="user-profile-img" class="profile-img hidden" src="" alt="프로필 사진">
+        <div id="user-profile-default" class="profile-default-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+      </div>
+      <button type="button" id="btn-change-profile-photo" class="btn-change-photo">사진 변경</button>
+      <input type="file" id="profile-file-input" accept="image/*" class="hidden">
+    </div>
+
     <div id="chat-messages" class="chat-messages">
       <div class="chat-message incoming">
         <div class="message-sender">MindFlow 봇</div>

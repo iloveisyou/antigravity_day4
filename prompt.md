@@ -187,6 +187,16 @@
 - Supabase 스토리지 버킷 `avatars` (자신 폴더 기반 INSERT/UPDATE 보안) 및 `chat-images` (인증 유저 INSERT 보안) RLS 정책 SQL 스크립트 `supabase_storage_policies.sql` 작성
 - `implementationPlan/202608141020.md`, `task/202608141020.md`, `walkthrough/202608141020.md` 문서 이력 관리 완료
 
+## 2026-08-18
+### 프롬프트
+> step21 의 1을 실행해줘.
+
+### 결과 (적용내용)
+- 실시간 채팅 창 상단에 원형 프로필 아바타 및 '사진 변경' 버튼이 포함된 프로필 관리 UI 영역 배치 (`index.html`, `style.css`)
+- 프로필 사진 미등록 시 기본 사람 아이콘 SVG가 표시되도록 구성
+- 원형 프로필 이미지 영역 또는 '사진 변경' 버튼을 누르면 내 컴퓨터에서 이미지 파일을 선택할 수 있도록 파일 선택창 입력 요소와 클릭 이벤트 연동 (`app.js`)
+- `implementationPlan/202608181035.md`, `task/202608181035.md`, `walkthrough/202608181035.md` 문서 이력 작성 완료
+
 
 
 

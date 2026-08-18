@@ -3,12 +3,14 @@
 Supabase SQL Editor에서 실행할 수 있는 `avatars` 및 `chat-images` 버킷 RLS 보안 정책 SQL 문입니다.
 
 ```sql
--- 1. storage.objects 테이블 RLS 활성화 (기본 활성화되어 있으나 재확인)
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
 -- =================================================================
 -- 1. avatars 버킷 보안 정책 (Public 버킷)
 -- =================================================================
+
+-- 기존 정책 삭제 (이미 존재하는 경우 대비)
+DROP POLICY IF EXISTS "Public Read Access for Avatars" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated Users Insert Avatar Own Folder" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated Users Update Avatar Own Folder" ON storage.objects;
 
 -- 1.1 [SELECT] 누구나 프로필 이미지를 조회(다운로드)할 수 있도록 허용
 CREATE POLICY "Public Read Access for Avatars"
@@ -41,6 +43,10 @@ WITH CHECK (
 -- =================================================================
 -- 2. chat-images 버킷 보안 정책
 -- =================================================================
+
+-- 기존 정책 삭제 (이미 존재하는 경우 대비)
+DROP POLICY IF EXISTS "Public Read Access for Chat Images" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated Users Insert Chat Images" ON storage.objects;
 
 -- 2.1 [SELECT] 누구나 채팅 이미지를 조회(다운로드)할 수 있도록 허용
 CREATE POLICY "Public Read Access for Chat Images"

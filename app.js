@@ -577,6 +577,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Profile Photo File Picker Interaction
+  const profileAvatarContainer = document.getElementById('profile-avatar-container');
+  const btnChangeProfilePhoto = document.getElementById('btn-change-profile-photo');
+  const profileFileInput = document.getElementById('profile-file-input');
+
+  function triggerProfileFilePicker() {
+    if (profileFileInput) {
+      profileFileInput.click();
+    }
+  }
+
+  if (profileAvatarContainer) {
+    profileAvatarContainer.addEventListener('click', triggerProfileFilePicker);
+  }
+
+  if (btnChangeProfilePhoto) {
+    btnChangeProfilePhoto.addEventListener('click', triggerProfileFilePicker);
+  }
 });
 
 

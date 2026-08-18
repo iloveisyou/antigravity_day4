@@ -159,3 +159,11 @@ user_id는 현재 로그인한 사용자의 ID가 자동으로 입력될 거야.
 4. 각 메시지 옆에 보낸 사람의 이메일(users_email컬럼) 중 @ 앞에 부분만을 함께 표시해줘
 
 ## step20. 파일 업로드와 스토리지
+(Supabase에서 스토리지 버킷 2개 생성, avatars, chat-images 이후 진행)
+- Supabase 스토리지의 보안 정책을 설정하고 싶어. 필요한 SQL 코드를 만들어 줘
+1. avatars 버킷 정책(public 버킷):
+    * 버킷이 공개(Public)라 누구나 파일을 볼 수 있으나, 명시적으로 SELECT 정책도 추가해야 해.
+    * 로그인한 사용자만 자신의 폴더(user_id 경로)에 프로필 사진을 올리거나 수정할 수 있어야 해.(INSERT, UPDATE)
+2. chat-images 버킷 정책(private 버킷):
+    * 버킷이 공개(Public)라 누구나 파일을 볼 수 있으나, 명시적으로 SELECT 정책도 추가해야 해.
+    * 로그인한 사용자만 채팅 이미지를 올릴 수 있어야 해.(INSERT)

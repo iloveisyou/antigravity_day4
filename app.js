@@ -420,11 +420,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const rowDiv = document.createElement('div');
     rowDiv.className = 'chat-message-row';
 
-    // Avatar element
-    if (msg.avatar_url) {
+    // Avatar element resolution
+    const currentUserAvatar = document.getElementById('user-profile-img')?.src;
+    const isProfileImgVisible = document.getElementById('user-profile-img') && !document.getElementById('user-profile-img').classList.contains('hidden');
+    const avatarUrlToUse = msg.avatar_url || (isOutgoing && isProfileImgVisible ? currentUserAvatar : '');
+
+    if (avatarUrlToUse) {
       const avatarImg = document.createElement('img');
       avatarImg.className = 'msg-avatar';
-      avatarImg.src = msg.avatar_url;
+      avatarImg.src = avatarUrlToUse;
       avatarImg.alt = nickname;
       rowDiv.appendChild(avatarImg);
     } else {
@@ -615,8 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
           .from('messages')
           .insert({
             content: messageText,
-            user_email: userEmail,
-            avatar_url: avatarUrl
+            user_email: userEmail
           });
 
         if (error) {

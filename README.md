@@ -100,6 +100,23 @@ Supabase에서 계정 생성할때 암호화 된 토큰을 발급 후, API가 �
 (6) 그리고 실시간으로 메시지를 받아오는 기능을 추가로 소스에서 구현해야 함
 (연결된 supabase의 messages 테이블의 모든 INSERT 이벤트를 구독)
 
+
+## day9. 파일 업로드와 스토리지 (vercel, supabase)
+- Supabase 프로젝트 왼쪽메뉴 Storage - 버킷(Bucket)이라는 폴더단위로 관리
+- 사용자의 프로필 사진을 담을 avatars 버킷
+  ㄴ Bucket name: avatars
+  ㄴ Public bucket: (활성) 공개 버킷 여부, 프로필 사진처럼 누구나 볼수 있어야함
+  ㄴ Restrict file size: (활성) 파일크기, 50MB
+  ㄴ Restrict MIME types: (활성) 모든 이미지 확장자 사용, image/*
+  ㄴ Create  
+- 채팅 메시지에 첨부될 이미지를 담을 chat-images 버킷
+  ㄴ Bucket name: chat-images
+  ㄴ Public bucket: (활성) 공개 버킷 여부, 프로필 사진처럼 누구나 볼수 있어야함
+  ㄴ Restrict file size: (활성) 파일크기, 50MB
+  ㄴ Restrict MIME types: (활성) 모든 이미지 확장자 사용, image/*
+  ㄴ Create  
+
+
 ## 4일차 모두 정리하면
 - 회원관리, 로그인 기능을 추가하고
 - 구글 로그인 기능도 추가해보고
@@ -108,6 +125,7 @@ Supabase에서 계정 생성할때 암호화 된 토큰을 발급 후, API가 �
 - 서버리스 함수로 API를 처리하고
 - Serverless Redis로 데이터를 저장하고, 
 - DB같이 수정도 가능하고 데이터를 볼수도 뽑을수도 있음. 하지만 엄청 간단한 data 처리만 가능할듯
-- Supabase는 사용자의 신원을 확인하고 관리
-- Supabase DataBase 는 SQL로 관리함 (수정, 삭제, 추가 다가능, 테이블 구조도 변경가능, RLS 기능으로 보안도 설정가능)
+- Supabase는 사용자의 신원을 확인하고 관리 - 회원관리, 로그인
+- Supabase DataBase 는 SQL로 관리함 (수정, 삭제, 추가 다가능, 테이블 구조도 변경가능, RLS 기능으로 보안도 설정가능) - Enable realtime 활성, RLS도 INSERT 설정 후 구독
+
 - 사용한 사이트: github, vercel, supabse, google Cloud (Console)

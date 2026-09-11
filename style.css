@@ -950,6 +950,42 @@ textarea::placeholder {
   border: 1px solid var(--border-color);
 }
 
+/* Chat Image Attachment Styles */
+.message-bubble.has-image {
+  padding: 6px;
+  background: transparent;
+  border: none;
+}
+
+.chat-msg-image {
+  max-width: 220px;
+  max-height: 250px;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: var(--transition-smooth);
+}
+
+.chat-msg-image:hover {
+  transform: scale(1.02);
+}
+
+.chat-img-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  color: #f87171;
+  font-size: 0.8rem;
+}
+
 
 
 

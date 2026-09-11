@@ -458,7 +458,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
-    bubble.textContent = msg.content || '';
+    
+    // Check if message content is an image format: [image](URL)
+    const imageMatch = msg.content && msg.content.match(/^\[image\]\((.*?)\)$/);
+    if (imageMatch) {
+      const imageUrl = imageMatch[1];
+      const imgEl = document.createElement('img');
+      imgEl.className = 'chat-msg-image';
+      imgEl.src = imageUrl;
+      imgEl.alt = '첨부 이미지';
+      imgEl.onload = () => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      };
+      imgEl.onerror = () => {
+        const errorBox = document.createElement('div');
+        errorBox.className = 'chat-img-error';
+        errorBox.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>이미지를 불러올 수 없습니다.</span>
+        `;
+        imgEl.replaceWith(errorBox);
+      };
+      bubble.appendChild(imgEl);
+      bubble.classList.add('has-image');
+    } else {
+      bubble.textContent = msg.content || '';
+    }
     rowDiv.appendChild(bubble);
 
     const timeDiv = document.createElement('div');
@@ -748,13 +777,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Chat Attachment Button Click Handler (Step 22-1)
+  // Chat Attachment Button Click & Image Upload Handler (Step 22-1 & 22-2)
   const chatAttachBtn = document.getElementById('chat-attach-btn');
   const chatImageInput = document.getElementById('chat-image-input');
 
   if (chatAttachBtn && chatImageInput) {
     chatAttachBtn.addEventListener('click', () => {
       chatImageInput.click();
+    });
+
+    chatImageInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.');
+        chatImageInput.value = '';
+        return;
+      }
+
+      try {
+        if (!window.supabaseClient) {
+          throw new Error('Supabase 클라이언트가 초기화되지 않았습니다.');
+        }
+
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session || !session.user) {
+          alert('로그인이 필요합니다.');
+          return;
+        }
+
+        const user = session.user;
+        const userId = user.id;
+        const fileExt = file.name.split('.').pop();
+        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const filePath = `${userId}/${Date.now()}_${sanitizedFileName}`;
+
+        // Upload file to 'chat-images' bucket in Supabase storage
+        const { error: uploadError } = await window.supabaseClient.storage
+          .from('chat-images')
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: publicUrlData } = window.supabaseClient.storage
+          .from('chat-images')
+          .getPublicUrl(filePath);
+
+        const publicUrl = publicUrlData.publicUrl;
+        const formattedContent = `[image](${publicUrl})`;
+
+        const userEmail = user.email;
+        const avatarUrl = user.user_metadata?.avatar_url || '';
+
+        // Insert new message with [image](URL) content into 'messages' table
+        const { error: insertError } = await window.supabaseClient
+          .from('messages')
+          .insert({
+            content: formattedContent,
+            user_email: userEmail,
+            avatar_url: avatarUrl
+          });
+
+        if (insertError) throw insertError;
+
+      } catch (err) {
+        console.error('이미지 업로드 및 메시지 전송 실패:', err);
+        alert('이미지 첨부 중 오류가 발생했습니다: ' + err.message);
+      } finally {
+        chatImageInput.value = '';
+      }
     });
   }
 });

@@ -460,7 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
     bubble.className = 'message-bubble';
     
     // Check if message content is an image format: [image](URL)
-    const imageMatch = msg.content && msg.content.match(/^\[image\]\((.*?)\)$/);
+    const trimmedContent = (msg.content || '').trim();
+    const imageMatch = trimmedContent.match(/^\[image\]\((.*?)\)$/);
     if (imageMatch) {
       const imageUrl = imageMatch[1];
       const imgEl = document.createElement('img');
@@ -809,16 +810,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const user = session.user;
         const userId = user.id;
-        const fileExt = file.name.split('.').pop();
-        const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const filePath = `${userId}/${Date.now()}_${sanitizedFileName}`;
+        const fileExt = file.name.split('.').pop() || 'png';
+        const filePath = `${userId}/${Date.now()}.${fileExt}`;
 
         // Upload file to 'chat-images' bucket in Supabase storage
         const { error: uploadError } = await window.supabaseClient.storage
           .from('chat-images')
-          .upload(filePath, file, { upsert: true });
+          .upload(filePath, file, { upsert: false });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Supabase Storage Upload Error:', uploadError);
+          throw uploadError;
+        }
 
         // Get public URL
         const { data: publicUrlData } = window.supabaseClient.storage
@@ -840,11 +843,15 @@ document.addEventListener('DOMContentLoaded', () => {
             avatar_url: avatarUrl
           });
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Supabase Messages Insert Error:', insertError);
+          throw insertError;
+        }
 
       } catch (err) {
         console.error('이미지 업로드 및 메시지 전송 실패:', err);
-        alert('이미지 첨부 중 오류가 발생했습니다: ' + err.message);
+        const errorMsg = err.message || err.error_description || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+        alert('이미지 첨부 중 오류가 발생했습니다: ' + errorMsg);
       } finally {
         chatImageInput.value = '';
       }

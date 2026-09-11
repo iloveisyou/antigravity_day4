@@ -58,4 +58,11 @@ CREATE POLICY "Authenticated Users Insert Chat Images"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (bucket_id = 'chat-images');
+
+-- 2.3 [UPDATE] 로그인한 사용자만 채팅 이미지 수정/덮어쓰기 허용
+CREATE POLICY "Authenticated Users Update Chat Images"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (bucket_id = 'chat-images')
+WITH CHECK (bucket_id = 'chat-images');
 ```

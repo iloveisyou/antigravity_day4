@@ -217,6 +217,98 @@
 - 클립 아이콘 버튼 클릭 시 이미지 파일 선택창이 열리도록 JS 연동 (`app.js`)
 - `implementationPlan/202608181116.md`, `task/202608181116.md`, `walkthrough/202608181116.md` 문서 이력 작성 완료
 
+## 2026-10-20
+### 프롬프트
+> 취소
+
+### 결과 (적용내용)
+- Step 17 계획 승인 대기 상태 취소 처리 및 현 소스코드 상태(Step 22까지 완료됨) 확인 및 안내
+
+### 프롬프트
+> 로그인 실패가 뜨는데 로그인 과련해서 확인해줘
+
+### 결과 (적용내용)
+- `supabase.js` 및 환경변수에 등록된 Supabase 도메인(`ylhbaiolxexzkuinsprj.supabase.co`) 네트워크 및 DNS 상태 진단
+- Supabase 무료 티어 장기 비활성화(7일 이상 미사용)로 인한 프로젝트 일시정지(Paused) 또는 도메인 만료(NXDOMAIN)로 인한 네트워크 연결 에러 규명
+
+### 프롬프트
+> 권한을 달라고 할때 한글로 물어봐줄수는 없나?
+
+### 결과 (적용내용)
+- 명령 실행 및 파일 조작 권한 요청 팝업 시 한글로 요약이 노출되도록 `.agents/AGENTS.md`에 '규칙 3: 사용자 소통 및 도구 권한 요청 언어(한글 적용)' 명시 및 저장 완료
+
+### 프롬프트
+> 선택하는 답변에 대해서도 영문이 아닌 한글로 선택지를 줘
+
+### 결과 (적용내용)
+- 질문 모달 및 선택지(Options)를 제공할 때 영문 대신 100% 한글 선택지를 제공하도록 `.agents/AGENTS.md` 규칙 3에 반영 완료
+
+### 프롬프트
+> 슈퍼베이스 일시정지 풀어도 안되는데?
+
+### 결과 (적용내용)
+- Supabase 복구(Restore) 진행 상태(녹색 점 Active 확인) 및 `supabase.js`에 설정된 프로젝트 URL/키와 실제 대시보드의 URL 일치 여부 확인 가이드 제공
+
+### 프롬프트
+> 질문지의 답변을 왜 계속 영어로 보여줘.. 한글로 보여줘
+
+### 결과 (적용내용)
+- 시스템 권한 팝업(Allow/Deny) 실행을 지양하고, 대화형 질문 도구(ask_question)를 통해 순수 한글 선택지로 구성된 질문창 제공
+- 사용자 응답('초록색 Active로 켜짐') 확인 후 실제 도메인 헬스체크 수행
+- 기존 `ylhbaiolxexzkuinsprj`는 영구 소멸 상태이며, 실제 복구/활성화된 프로젝트는 Vercel에 연동된 `qzbkalpmjjfzroenmoyi`임을 규명
+- 사용자 확인 질문: 사용자가 직접 대시보드에서 Project URL 및 키를 확인 후 전달하기로 선택함
+
+### 프롬프트
+> vercel 에 이런 에러가 보이던
+> Error · [fix: resolve chat image upload issue on deployed environment](https://vercel.com/iloveisyous-projects/antigravity-day4/Rgb3vPCtJeVDL8ujS6qyRcYw4goH)
+
+### 결과 (적용내용)
+- Vercel CLI 배포 이력(dpl_Rgb3vPCtJeVDL8ujS6qyRcYw4goH) 및 로컬 빌드 상태 정밀 분석
+- 소스코드 컴파일(JS/CSS/API) 자체는 정상이나, 배포 과정에서 0ms 만에 중단(Build 0ms Error)된 이력 확인
+- 원인 분석 및 Vercel 콘솔 상의 상세 에러 확인 가이드 제공
+
+### 프롬프트
+> 나의 일기 히스토리가 안보이고 실패하는데 원인을 찾아줘
+
+### 결과 (적용내용)
+- `fetchHistory` 호출 및 `/api/history` 서버리스 함수 로직 점검
+- 1차 원인: `REDIS_URL`의 호스트(`twinkling-helpful-top-24270.db.redis.io`)가 만료/삭제되어 Redis 연결 시 `ENOTFOUND` 에러 발생 확인
+- 2차 원인: Supabase 인증 미완료 또는 죽은 Supabase URL로 인한 Bearer 토큰 검증 401/500 에러 확인
+- 원인 및 해결 절차 안내 완료
+
+### 프롬프트
+> 새로생성한 redius 어떻게 연결하는지 알려줘
+
+### 결과 (적용내용)
+- Vercel Storage 마켓플레이스 연동 및 로컬 .env.development.local 반영 절차 상세 가이드 제공
+
+### 프롬프트
+> 기존 redis 랑 연결 끊는 방법
+
+### 결과 (적용내용)
+- Vercel Storage 탭 및 프로젝트 설정에서 기존 Redis 연동 해제(Disconnect) 및 삭제(Delete) 절차 안내
+
+## 2026-10-22
+### 프롬프트
+> "환경변수 새로 가져와줘
+
+### 결과 (적용내용)
+- `npx vercel env pull`로 Vercel의 최신 환경변수를 `.env.local`로 수신 확인
+- 신규 Redis(`pigs-hospitable-rock-33934`) 인스턴스 핑 테스트 성공(PONG)
+- 신규 Supabase(`qzbkalpmjjfzroenmoyi`) 인증 세션 헬스체크 성공(SUCCESS)
+- 프론트엔드(`supabase.js`), 백엔드(`api/_lib/supabase.js`, `api/analyze.js`, `api/history.js`), 환경변수 동기화 작업 완료
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

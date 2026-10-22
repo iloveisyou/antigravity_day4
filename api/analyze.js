@@ -3,11 +3,13 @@ import { supabase } from './_lib/supabase.js';
 
 let redis = null;
 function getRedisClient() {
-  if (!redis && process.env.REDIS_URL) {
-    redis = new Redis(process.env.REDIS_URL);
+  const redisUrl = process.env.REDIS_URL || process.env.REDIS_URL_REDIS_URL;
+  if (!redis && redisUrl) {
+    redis = new Redis(redisUrl);
   }
   return redis;
 }
+
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

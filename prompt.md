@@ -298,6 +298,52 @@
 - 신규 Supabase(`qzbkalpmjjfzroenmoyi`) 인증 세션 헬스체크 성공(SUCCESS)
 - 프론트엔드(`supabase.js`), 백엔드(`api/_lib/supabase.js`, `api/analyze.js`, `api/history.js`), 환경변수 동기화 작업 완료
 
+### 프롬프트
+> 로그인이 안되는데?
+
+### 결과 (적용내용)
+- 신규 Supabase 데이터베이스(`qzbkalpmjjfzroenmoyi`)의 `auth.users` 목록 조회
+- 현재 데이터베이스에 등록된 사용자가 0명(`Total Users: 0`)인 상태임을 확인
+- 기존 만료된 DB 대신 새 DB가 연결되었으므로, 기존 계정이 아닌 **'회원가입'** 버튼을 통해 새 계정을 먼저 생성해야 함을 안내
+
+### 프롬프트
+> 로그인 실패: Invalid login credentials
+> 로그인 에러 남
+
+### 결과 (적용내용)
+- `auth.users` DB 실시간 재조회 결과 사용자 수 0명 상태 지속 확인
+- 'Invalid login credentials'는 DB에 해당 아이디/비밀번호가 전혀 등록되어 있지 않을 때 발생하는 전형적인 에러임을 설명
+- 화면에서 **'회원가입'** 버튼을 먼저 클릭하거나, 테스트용 계정을 즉시 생성해 드리는 옵션 안내
+
+### 프롬프트
+> 회원가입 안되는데?
+
+### 결과 (적용내용)
+- `supabase.auth.signUp()` 직접 테스트 수행 결과 `429 email rate limit exceeded` 에러 확인
+- Supabase 무료 티어 기본 SMTP의 시간당 발송 제한(3~4통)으로 인한 가입 확인 이메일 전송 차단 원인 규명
+- 관리자 권한으로 인증 완료된 계정(`user@mindflow.com` / `Password123!`) 즉시 생성 및 클라이언트 로그인 성공 검증 완료
+- Supabase 대시보드에서 `Confirm email` 옵션 끄기(자유 가입 허용) 방법 안내
+
+### 프롬프트
+> 컨펌 이메일 옵션 끄는 옵션이 니가 설명해준곳에 없어
+
+### 결과 (적용내용)
+- 최신 Supabase 대시보드 UI 개편에 따른 'Confirm email' / 'Enable email confirmations' 정확한 경로 2가지(Project Settings 또는 Auth Providers 펼침 메뉴) 상세 재안내
+
+### 프롬프트
+> 히스토리 로드를 실패하네
+
+### 결과 (적용내용)
+- 실제 사용자 JWT 토큰으로 `/api/history` 핸들러 직접 테스트 수행: HTTP 200 OK 및 빈 배열(`[]`) 정상 응답 확인
+- 로컬 환경 원인 규명: 터미널의 `vercel dev`가 환경변수 업데이트 전 실행된 상태로 남아있어 구형 Redis/Supabase로 접속 시도한 원인 규명
+- 배포 환경 원인 규명: `package.json`의 ESM 모듈 선언(`type: module`) 부재로 인한 Vercel 원격 빌드 오류 규명 및 `"type": "module"` 추가 완료
+- `app.js` 내 에러 메시지 상세 출력 개선 및 Vercel 배포/로컬 재실행 안내
+
+
+
+
+
+
 
 
 

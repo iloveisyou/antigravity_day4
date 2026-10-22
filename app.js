@@ -199,8 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       if (!response.ok) {
-        throw new Error('히스토리를 불러오는 데 실패했습니다.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.details || `서버 응답 오류 (상태코드: ${response.status})`);
       }
+
       const historyData = await response.json();
       
       if (historyData.length === 0) {

@@ -4,10 +4,9 @@
   "type": "module",
   "description": "AI Emotion Diary with Vercel Serverless Function and Redis Integration",
   "main": "app.js",
-
-
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
-    "ioredis": "^5.4.1"
+    "ioredis": "^5.4.1",
+    "postgres": "^3.4.9"
   }
 }

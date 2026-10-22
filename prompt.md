@@ -372,6 +372,18 @@
 - 문제 1~7(소멸된 DB, 로그인 실패, 회원가입 이메일 발송 제한, Node 24 ESM 모듈 빌드 에러, Vercel 환경변수 레거시 잔존으로 인한 토큰 불일치, 프론트엔드 캐싱 및 401 갇힘, 로컬 dev 서버 재기동 필요성)에 대해 원인과 해결책 총정리
 - 현재 활성 인프라 및 정상 테스트 계정(`user@mindflow.com`), 사이트 정상 이용 가이드 수록
 
+### 프롬프트
+> 이제실시간 채팅이 안되는데 그 원인을 찾아보자
+
+### 결과 (적용내용)
+- 신규 Supabase DB(`qzbkalpmjjfzroenmoyi`) 내부 인프라 전수 점검 수행
+- 원인 규명:
+  1) `public.messages` 테이블이 신규 DB에 전혀 생성되어 있지 않음 (`schema cache` 미등록)
+  2) `supabase_realtime` publication에 `messages` 테이블 실시간 복제가 등록되어 있지 않음
+  3) Storage 버킷 `avatars`, `chat-images` 및 RLS 보안 정책 누락
+- 복구 계획 수립 (`implementationPlan/202610221700.md`, `task/202610221700.md`) 및 실행 예정
+
+
 
 
 

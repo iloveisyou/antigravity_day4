@@ -339,6 +339,17 @@
 - 배포 환경 원인 규명: `package.json`의 ESM 모듈 선언(`type: module`) 부재로 인한 Vercel 원격 빌드 오류 규명 및 `"type": "module"` 추가 완료
 - `app.js` 내 에러 메시지 상세 출력 개선 및 Vercel 배포/로컬 재실행 안내
 
+### 프롬프트
+> 히스토리 로드 실패: Unauthorized: Invalid token
+> 이렇게 에러 뜸
+
+### 결과 (적용내용)
+- 배포 사이트에서 직접 토큰 헤더 요청을 재현하여 상세 원인 포착 (`unrecognized JWT kid for algorithm ES256`)
+- 원인: 프론트엔드는 신규 DB(`qzbkalpmjjfzroenmoyi`)로 로그인했으나, 백엔드(`api/_lib/supabase.js`)가 Vercel 환경변수에 잔존하던 구형 레거시 DB(`ylhbaiolxexzkuinsprj`)를 우선 참조하여 토큰 서명 불일치 발생 확인
+- 조치: `api/_lib/supabase.js`에서 소멸된 구형 프로젝트 주소를 건너뛰고 활성 프로젝트(`NEXT_PUBLIC2_` 및 신규 URL)를 강제 우선 참조하도록 수정 완료
+- `.env.local`의 `SUPABASE_URL` 및 Service Role Key 동기화 완료
+
+
 
 
 

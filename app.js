@@ -143,6 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ text }),
       });
 
+      if (response.status === 401) {
+        if (window.supabaseClient) {
+          await window.supabaseClient.auth.signOut();
+        }
+        updateAuthUI(null);
+        alert('로그인 세션이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.');
+        return;
+      }
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || '감정 분석 요청 중 문제가 발생했습니다.');
@@ -198,6 +207,28 @@ document.addEventListener('DOMContentLoaded', () => {
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         }
       });
+
+      if (response.status === 401) {
+        console.warn('Authentication token is invalid or expired. Resetting session...');
+        if (window.supabaseClient) {
+          await window.supabaseClient.auth.signOut();
+        }
+        updateAuthUI(null);
+        historyContainer.innerHTML = `
+          <div style="text-align: center; padding: 20px;">
+            <p style="color: #ef4444; margin-bottom: 12px; font-weight: 500;">로그인 세션이 만료되었거나 유효하지 않습니다.</p>
+            <button id="btn-relogin" class="action-btn" style="padding: 8px 16px; font-size: 14px;">다시 로그인하기</button>
+          </div>
+        `;
+        const btnRelogin = document.getElementById('btn-relogin');
+        if (btnRelogin) {
+          btnRelogin.addEventListener('click', () => {
+            updateAuthUI(null);
+          });
+        }
+        return;
+      }
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || errorData.details || `서버 응답 오류 (상태코드: ${response.status})`);
@@ -246,7 +277,24 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     } catch (err) {
       console.error('History load error:', err);
-      historyContainer.innerHTML = `<p class="placeholder-text" style="color: #ef4444;">히스토리 로드 실패: ${err.message}</p>`;
+      historyContainer.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <p class="placeholder-text" style="color: #ef4444; margin-bottom: 10px;">히스토리 로드 실패: ${err.message}</p>
+          <button id="btn-force-reset-session" style="padding: 6px 12px; font-size: 13px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; cursor: pointer;">
+            세션 초기화 후 다시 로그인
+          </button>
+        </div>
+      `;
+      const btnForceReset = document.getElementById('btn-force-reset-session');
+      if (btnForceReset) {
+        btnForceReset.addEventListener('click', async () => {
+          if (window.supabaseClient) {
+            await window.supabaseClient.auth.signOut();
+          }
+          localStorage.clear();
+          location.reload();
+        });
+      }
     }
   }
 

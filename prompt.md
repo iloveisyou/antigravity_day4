@@ -495,13 +495,19 @@
 ### 프롬프트
 > 이번에 알계된 스케줄 같이 유용하고 좋은 기능들 중 내가 알면 좋을거 같은 것들을 더 알려줄수 있어?
 
+### 프롬프트
+> 나는 지금 알게 된거 같이
+> 혹시 깃이나 버셀이나 다른 서비스 등에서도 이런 좋은것이 있는데
+> 내가 몰랐던것을 물어본거였어
+> 내가 알고 있는데 이런 숨겨진 기능이 있는 서비스들 깃이나 버셀 말고도 다른 것에서도 있으면 알려달라는 거였음
+
 ### 결과 (적용내용)
-- 개발 생산성을 극대화하고 서버 비용을 0원으로 줄여주는 실전 꿀기능 5선 소개
-  1) GitHub Actions를 이용한 서버리스 자동 크롤러 & 텔레그램 알림 봇 (월 서버비 0원)
-  2) Vercel의 브랜치별 실시간 미리보기 배포 (Preview Deployment)
-  3) Webhook(웹훅)을 통한 서비스 간 실시간 이벤트 자동 연동
-  4) GitHub Pages를 통한 무료 정적 웹 호스팅 및 SSL 자동 갱신
-  5) Cloudflare Workers를 활용한 초고속 엣지 컴퓨팅
+- 흔히 '단순한 용도'로만 알고 있지만 알고 보면 엄청난 가치를 주는 플랫폼별 숨겨진 보물 기능(Hidden Gems) 안내
+  1) GitHub: 웹 에디터(단축키 '.'), 무제한 무료 파일 배포소(Releases), 소스코드 기반 무료 블로그/웹사이트(GitHub Pages)
+  2) Vercel: 무설정 방문자/속도 분석(Speed Insights), 0ms 초고속 전역 설정(Edge Config), 자동 OG 이미지 생성(@vercel/og)
+  3) Google Sheets: 구글 시트를 무료 REST API 백엔드로 활용(App Script, SheetDB 등)
+  4) Cloudflare: 포트포워딩 없이 내 컴퓨터를 전 세계에 웹사이트로 여는 마법(Cloudflare Tunnel)
+  5) Supabase: 서버 없이 DB만으로 권한을 완벽 통제하는 RLS(Row Level Security) 및 웹소켓 서버 없는 실시간 동기화(Realtime)
 
 
 

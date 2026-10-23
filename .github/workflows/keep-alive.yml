@@ -1,0 +1,34 @@
+name: Keep Alive Free Tier Services
+
+on:
+  schedule:
+    # 매주 월요일, 목요일 UTC 00:00 (한국 시간 오전 9시) 자동 실행
+    - cron: '0 0 * * 1,4'
+  workflow_dispatch:
+    # GitHub 웹 UI에서 수동으로 'Run workflow' 버튼을 눌러 언제든 즉시 테스트 가능
+
+jobs:
+  ping-services:
+    name: Ping Supabase & Redis Keep-Alive Endpoint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger Keep-Alive API
+        run: |
+          echo "Sending keep-alive request to Vercel production deployment..."
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" "https://antigravity-day4.vercel.app/api/keep-alive")
+          
+          BODY=$(echo "$RESPONSE" | sed -e '$d')
+          STATUS=$(echo "$RESPONSE" | tail -n 1 | cut -d':' -f2)
+
+          echo "Response Body:"
+          echo "$BODY"
+          echo "HTTP Status Code: $STATUS"
+
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Keep-alive ping failed with status $STATUS"
+            exit 1
+          fi
+
+          echo "Keep-alive ping succeeded! Supabase and Redis activities recorded."

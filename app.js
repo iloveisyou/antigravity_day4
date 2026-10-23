@@ -209,23 +209,26 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (response.status === 401) {
-        console.warn('Authentication token is invalid or expired. Resetting session...');
+        const errorData = await response.json().catch(() => ({}));
+        console.warn('Authentication or backend configuration error:', errorData);
+
+        // 만약 서버 측 API 키 오류(Invalid API key)라면 사용자 세션을 강제 파기하지 않음
+        if (errorData.details && errorData.details.includes('Invalid API key')) {
+          historyContainer.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+              <p style="color: #ef4444; margin-bottom: 8px; font-weight: 500;">서버 설정 오류: 백엔드 Supabase API 키가 일치하지 않습니다.</p>
+              <p style="color: #888; font-size: 13px;">로컬 터미널에서 vercel dev를 재시작해 주세요.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // 실제 토큰 만료 또는 비정상 토큰인 경우
         if (window.supabaseClient) {
           await window.supabaseClient.auth.signOut();
         }
         updateAuthUI(null);
-        historyContainer.innerHTML = `
-          <div style="text-align: center; padding: 20px;">
-            <p style="color: #ef4444; margin-bottom: 12px; font-weight: 500;">로그인 세션이 만료되었거나 유효하지 않습니다.</p>
-            <button id="btn-relogin" class="action-btn" style="padding: 8px 16px; font-size: 14px;">다시 로그인하기</button>
-          </div>
-        `;
-        const btnRelogin = document.getElementById('btn-relogin');
-        if (btnRelogin) {
-          btnRelogin.addEventListener('click', () => {
-            updateAuthUI(null);
-          });
-        }
+        alert('로그인 세션이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.');
         return;
       }
 

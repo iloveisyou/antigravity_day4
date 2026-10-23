@@ -20,20 +20,31 @@ function getValidUrl() {
   return ACTIVE_PROJECT_URL;
 }
 
+function isKeyForActiveProject(key) {
+  if (!key || typeof key !== 'string') return false;
+  try {
+    const parts = key.split('.');
+    if (parts.length !== 3) return false;
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+    return payload && payload.ref === 'qzbkalpmjjfzroenmoyi';
+  } catch {
+    return false;
+  }
+}
+
 function getValidKey() {
   const candidates = [
     process.env.NEXT_PUBLIC2_SUPABASE_SERVICE_ROLE_KEY,
-    process.env.NEXT_PUBLIC2_SUPABASE_ANON_KEY,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.NEXT_PUBLIC2_SUPABASE_ANON_KEY,
     process.env.SUPABASE_ANON_KEY
   ];
   for (const key of candidates) {
-    // Legacy key for ylhbaiolxexzkuinsprj contains its project ref in JWT payload
-    if (key && !key.includes('ylhbaiolxexzkuinsprj')) {
+    if (isKeyForActiveProject(key)) {
       return key;
     }
   }
-  return ACTIVE_SERVICE_ROLE_KEY || ACTIVE_ANON_KEY;
+  return ACTIVE_SERVICE_ROLE_KEY;
 }
 
 const supabaseUrl = getValidUrl();

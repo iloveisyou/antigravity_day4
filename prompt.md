@@ -381,7 +381,20 @@
   1) `public.messages` 테이블이 신규 DB에 전혀 생성되어 있지 않음 (`schema cache` 미등록)
   2) `supabase_realtime` publication에 `messages` 테이블 실시간 복제가 등록되어 있지 않음
   3) Storage 버킷 `avatars`, `chat-images` 및 RLS 보안 정책 누락
-- 복구 계획 수립 (`implementationPlan/202610221700.md`, `task/202610221700.md`) 및 실행 예정
+- 복구 계획 수립 (`implementationPlan/202610221700.md`, `task/202610221700.md`) 및 실행 완료
+
+## 2026-10-23
+### 프롬프트
+> 로컬서버에서 로그인해도 계속 로그인 화면으로 튕기는 거 같이 되는데 확인해줘
+
+### 결과 (적용내용)
+- 로그인 성공 직후 다시 로그인 화면으로 튕겨나가는 현상의 근본 원인 규명
+- [원인 1] `.env` 파일에 100% 구형 레거시 Supabase(`ylhbaiolxexzkuinsprj`) 키가 잔존하고 있었음
+- [원인 2] `api/_lib/supabase.js`의 키 필터링이 `key.includes('ylhbaiolxexzkuinsprj')` 평문 비교였으나, JWT 토큰 특성상 프로젝트 ref가 Base64 인코딩(`InlsaGJhaW9seGV4emt1aW5zcHJq`)되어 있어 구형 키가 필터링을 뚫고 통과함
+- [원인 3] 신규 URL(`qzbkalpmjjfzroenmoyi`)과 구형 키(`ylhbaiolxexzkuinsprj`)가 결합되어 백엔드가 `{"details":"Invalid API key"}` (401)을 냈고, 프론트엔드가 401을 받자마자 `signOut()`을 실행하여 로그인 화면으로 튕김
+- [원인 4] 어제 4:25PM에 기동된 구형 로컬 dev 프로세스(PID 10572)가 미종료 상태로 메모리에 구형 설정을 유지하고 있었음
+- 조치 계획: `.env` 신규 동기화, `supabase.js` JWT ref 디코딩 검증 로직 보강, `app.js` 401 튕김 방어 개선, 로컬 프로세스 재기동
+
 
 
 
